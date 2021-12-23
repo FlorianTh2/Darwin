@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "xmaXU4YE2nbpJMsZyKdFMwi+nDCJTW8ZvNkPPKyuTbs=",
+  "Source": "hello-asp_identity",
+  "BasePath": "_content/hello-asp_identity",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
