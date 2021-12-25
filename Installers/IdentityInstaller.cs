@@ -1,3 +1,4 @@
+using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
 using Microsoft.AspNetCore.Identity;
 
@@ -10,11 +11,11 @@ public static class IdentityInstaller
         services.AddIdentity<AppUser, AppRole>()
             .AddRoles<AppRole>()
             // to make entityFramework function with identity
-            .AddEntityFrameworkStores<DataContext>();
+            .AddEntityFrameworkStores<DbContext>();
 
         services.Configure<IdentityOptions>(options =>
         {
-            // options.Password getting ignored since definition at fluent-validation ist
+            // options.Password getting ignored since definition at fluent-validation is being used
         });
     }
 }
