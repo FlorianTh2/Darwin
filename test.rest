@@ -1,0 +1,12 @@
+@baseUrl = https://localhost:5000
+@version = v1
+
+### user-api-test
+# @name userAuth
+
+POST {{baseUrl}}/{{version}}/login HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+#### Variable Response
+@accessToken = {{userAuth.response.body.$.access_token}}

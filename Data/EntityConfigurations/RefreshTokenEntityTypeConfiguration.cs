@@ -11,8 +11,13 @@ public class RefreshTokenEntityTypeConfiguration : IEntityTypeConfiguration<Refr
         builder.ToTable(nameof(RefreshToken).ToLower(), DbContext.DEFAULT_SCHEMA);
 
         builder.HasKey(a => a.Token);
-        builder.Property(a => a.Token).ValueGeneratedOnAdd();
+        builder.Property(a => a.Token)
+            .ValueGeneratedOnAdd();
 
-        builder.HasOne(a => a.User).WithMany().HasForeignKey(a => nameof(a.UserId)).OnDelete(DeleteBehavior.)
+        builder.HasOne(a => a.User)
+            .WithMany()
+            .HasForeignKey(a => nameof(a.UserId))
+            .IsRequired(true)
+            .OnDelete(DeleteBehavior.ClientSetNull);
     }
 }
