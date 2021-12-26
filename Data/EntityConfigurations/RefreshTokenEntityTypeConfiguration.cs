@@ -8,7 +8,7 @@ public class RefreshTokenEntityTypeConfiguration : IEntityTypeConfiguration<Refr
 {
     public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
-        builder.ToTable(nameof(RefreshToken).ToLower(), DbContext.DEFAULT_SCHEMA);
+        builder.ToTable(nameof(RefreshToken).ToLower(), DataContext.DEFAULT_SCHEMA);
 
         builder.HasKey(a => a.Token);
         builder.Property(a => a.Token)
@@ -16,7 +16,7 @@ public class RefreshTokenEntityTypeConfiguration : IEntityTypeConfiguration<Refr
 
         builder.HasOne(a => a.User)
             .WithMany()
-            .HasForeignKey(a => nameof(a.UserId))
+            .HasForeignKey(nameof(RefreshToken.UserId))
             .IsRequired(true)
             .OnDelete(DeleteBehavior.ClientSetNull);
     }

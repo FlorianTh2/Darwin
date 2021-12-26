@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace hello_asp_identity.Domain;
 
-public class AppRole : IdentityRole<Guid>
+public class AppRole : IdentityRole<string>
 {
-    public ICollection<AppUserRole> UserRoles { get; set; }
+    public virtual ICollection<AppUserRole> UserRoles { get; set; }
     public string Comment { get; set; }
     public DateTime CreatedOn { get; set; }
     public string CreatorId { get; set; }

@@ -9,9 +9,8 @@ public static class IdentityInstaller
     public static void InstallIdentity(this IServiceCollection services)
     {
         services.AddIdentity<AppUser, AppRole>()
-            .AddRoles<AppRole>()
             // to make entityFramework function with identity
-            .AddEntityFrameworkStores<DbContext>();
+            .AddEntityFrameworkStores<DataContext>();
 
         services.Configure<IdentityOptions>(options =>
         {

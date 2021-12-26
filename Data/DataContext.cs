@@ -1,12 +1,22 @@
 using hello_asp_identity.Data.EntityConfigurations;
 using hello_asp_identity.Domain;
 using hello_asp_identity.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace hello_asp_identity.Data;
 
-public class DbContext : IdentityDbContext<AppUser, AppRole, Guid>
+public class DataContext : IdentityDbContext<
+    AppUser,
+    AppRole,
+    string,
+    IdentityUserClaim<string>,
+    AppUserRole,
+    IdentityUserLogin<string>,
+    IdentityRoleClaim<string>,
+    IdentityUserToken<string>
+    >
 {
     public const string DEFAULT_SCHEMA = "dbo";
     public DbSet<RefreshToken> RefreshTokens { get; set; }
@@ -14,7 +24,7 @@ public class DbContext : IdentityDbContext<AppUser, AppRole, Guid>
     private readonly ICurrentUserService _currentUserService;
     private IDateTimeService _dateTimeService;
 
-    public DbContext(DbContextOptions<DbContext> options, ICurrentUserService currentUserService, IDateTimeService dateTimeService)
+    public DataContext(DbContextOptions<DataContext> options, ICurrentUserService currentUserService, IDateTimeService dateTimeService)
         : base(options)
     {
         this._currentUserService = currentUserService;
@@ -23,8 +33,11 @@ public class DbContext : IdentityDbContext<AppUser, AppRole, Guid>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.ApplyConfiguration(new RefreshTokenEntityTypeConfiguration());
         base.OnModelCreating(builder);
+
+        builder.ApplyConfiguration(new AppUserEntityTypeConfiguration());
+        builder.ApplyConfiguration(new AppRoleEntityTypeConfiguration());
+        builder.ApplyConfiguration(new RefreshTokenEntityTypeConfiguration());
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())

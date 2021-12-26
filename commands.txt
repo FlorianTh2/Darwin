@@ -1,0 +1,14 @@
+cd Hello.WebApi
+dotnet ef migrations add "AdjustedContext" --context DataContext -o .\Data\Migrations # --project "Hello.WebApi"
+
+cd Hello.WebApi
+dotnet ef database update --context DataContext # --project "Hello.WebApi"
+
+dotnet ef database update --context DataContext –TargetMigration: "20212342332_AddedToContext" # --project "Hello.WebApi" # before -targetmigration
+
+dotnet ef migrations remove
+
+sql management studio delete all current lettershop templates
+delete from [ZenitDb].[dbo].[LettershopTemplates]
+
+delete from [hello-auth].[dbo].[AspNetUsers]
