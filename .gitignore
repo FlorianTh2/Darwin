@@ -1,4 +1,4 @@
-appsettings.Development.json
+appsettings.json
 
 .vscode/*
 !.vscode/settings.json
