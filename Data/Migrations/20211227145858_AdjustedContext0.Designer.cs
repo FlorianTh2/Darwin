@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using hello_asp_identity.Data;
@@ -11,13 +12,14 @@ using hello_asp_identity.Data;
 namespace hello_asp_identity.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20211227145858_AdjustedContext0")]
+    partial class AdjustedContext0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("dbo")
+                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "6.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -68,7 +70,7 @@ namespace hello_asp_identity.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex");
 
-                    b.ToTable("AppRole", "dbo");
+                    b.ToTable("AppRole", "public");
                 });
 
             modelBuilder.Entity("hello_asp_identity.Domain.AppUser", b =>
@@ -154,7 +156,7 @@ namespace hello_asp_identity.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("AppUser", "dbo");
+                    b.ToTable("AppUser", "public");
                 });
 
             modelBuilder.Entity("hello_asp_identity.Domain.AppUserRole", b =>
@@ -169,7 +171,7 @@ namespace hello_asp_identity.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", "dbo");
+                    b.ToTable("AspNetUserRoles", "public");
                 });
 
             modelBuilder.Entity("hello_asp_identity.Domain.RefreshToken", b =>
@@ -201,7 +203,7 @@ namespace hello_asp_identity.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshToken", "dbo");
+                    b.ToTable("RefreshToken", "public");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -226,7 +228,7 @@ namespace hello_asp_identity.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", "dbo");
+                    b.ToTable("AspNetRoleClaims", "public");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -251,7 +253,7 @@ namespace hello_asp_identity.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", "dbo");
+                    b.ToTable("AspNetUserClaims", "public");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
@@ -273,7 +275,7 @@ namespace hello_asp_identity.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", "dbo");
+                    b.ToTable("AspNetUserLogins", "public");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -292,7 +294,7 @@ namespace hello_asp_identity.Data.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", "dbo");
+                    b.ToTable("AspNetUserTokens", "public");
                 });
 
             modelBuilder.Entity("hello_asp_identity.Domain.AppUserRole", b =>

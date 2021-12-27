@@ -7,10 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.InstallOptions(builder.Configuration);
 builder.Services.InstallProjectServices();
 builder.Services.InstallDb(builder.Configuration);
-builder.Services.InstallIdentity();
+builder.Services.InstallIdentity(builder.Configuration);
+builder.Services.InstallJwt(builder.Configuration);
 builder.Services.InstallMvc();
 builder.Services.InstallSwagger();
+
 var app = builder.Build();
+app.InstallCreateMigrateSeedDb();
 
 // http-request pipeline
 app.InstallRequestPipeline();

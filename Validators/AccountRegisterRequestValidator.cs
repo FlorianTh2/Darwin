@@ -2,13 +2,19 @@ using System.Data;
 using FluentValidation;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Extensions;
+using hello_asp_identity.Options;
+using Microsoft.Extensions.Options;
 
 namespace hello_asp_identity.Validators;
 
 public class AccountRegisterRequestValidator : AbstractValidator<AccountRegisterRequest>
 {
-    public AccountRegisterRequestValidator()
+    private readonly AccountSecruityOptions _accountSecruityOptions;
+
+    public AccountRegisterRequestValidator(IOptions<AccountSecruityOptions> accountSecruityOptions)
     {
+        _accountSecruityOptions = accountSecruityOptions.Value;
+
         RuleFor(a => a.UserName)
             .NotEmpty()
             .WithMessage("username_required");
@@ -22,7 +28,7 @@ public class AccountRegisterRequestValidator : AbstractValidator<AccountRegister
         RuleFor(a => a.Password)
             .NotEmpty()
             .WithMessage("password_required")
-            .Password();
+            .Password(minimumLength: _accountSecruityOptions.PasswordLength);
 
         RuleFor(a => a.PasswordConfirm)
             .NotEmpty()

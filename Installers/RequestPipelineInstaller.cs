@@ -7,9 +7,17 @@ public static class RequestPipelineInstaller
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwaggerUI(a =>
+            {
+                a.SwaggerEndpoint("swagger/v1/swagger.json", "hello-asp-identity (V1)");
+                if (app.Environment.IsDevelopment())
+                {
+                    a.RoutePrefix = string.Empty;
+                }
+            });
         }
         app.UseHttpsRedirection();
+        app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
     }

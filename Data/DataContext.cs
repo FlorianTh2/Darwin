@@ -4,6 +4,7 @@ using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace hello_asp_identity.Data;
 
@@ -24,7 +25,10 @@ public class DataContext : IdentityDbContext<
     private readonly ICurrentUserService _currentUserService;
     private IDateTimeService _dateTimeService;
 
-    public DataContext(DbContextOptions<DataContext> options, ICurrentUserService currentUserService, IDateTimeService dateTimeService)
+    public DataContext(
+        DbContextOptions<DataContext> options,
+        ICurrentUserService currentUserService,
+        IDateTimeService dateTimeService)
         : base(options)
     {
         this._currentUserService = currentUserService;
@@ -34,6 +38,8 @@ public class DataContext : IdentityDbContext<
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.HasDefaultSchema(DEFAULT_SCHEMA);
 
         builder.ApplyConfiguration(new AppUserEntityTypeConfiguration());
         builder.ApplyConfiguration(new AppRoleEntityTypeConfiguration());
