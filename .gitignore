@@ -1,4 +1,21 @@
 appsettings.json
+kubernetes-secrets.yaml
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+msbuild.log
+msbuild.err
+msbuild.wrn
 
 .vscode/*
 !.vscode/settings.json
