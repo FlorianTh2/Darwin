@@ -9,11 +9,7 @@ public static class RequestPipelineInstaller
             app.UseSwagger();
             app.UseSwaggerUI(a =>
             {
-                a.SwaggerEndpoint("swagger/v1/swagger.json", "hello-asp-identity (V1)");
-                if (app.Environment.IsDevelopment())
-                {
-                    a.RoutePrefix = string.Empty;
-                }
+                a.SwaggerEndpoint("v1/swagger.json", "hello-asp-identity (V1)");
             });
         }
         app.UseHttpsRedirection();
