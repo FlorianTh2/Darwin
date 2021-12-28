@@ -12,12 +12,12 @@ public static class DbInstaller
         services.AddHttpContextAccessor();
 
         string connectionString = config.GetSection(ConnectionStringOptions.SectionName).Get<ConnectionStringOptions>().Local;
-        services.AddDbContext<DataContext>(options =>
+        services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(
                 connectionString,
                 a =>
                 {
-                    a.MigrationsHistoryTable(HistoryRepository.DefaultTableName, DataContext.DEFAULT_SCHEMA);
+                    a.MigrationsHistoryTable(HistoryRepository.DefaultTableName, AppDbContext.DEFAULT_SCHEMA);
                     a.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorCodesToAdd: null);
                 }));
     }

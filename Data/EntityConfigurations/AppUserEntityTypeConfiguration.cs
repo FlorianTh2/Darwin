@@ -8,7 +8,7 @@ public class AppUserEntityTypeConfiguration : IEntityTypeConfiguration<AppUser>
 {
     public void Configure(EntityTypeBuilder<AppUser> builder)
     {
-        builder.ToTable(nameof(AppUser), DataContext.DEFAULT_SCHEMA);
+        builder.ToTable(nameof(AppUser), AppDbContext.DEFAULT_SCHEMA);
 
         builder.HasKey(a => a.Id);
         builder.Property(a => a.Id).ValueGeneratedOnAdd();

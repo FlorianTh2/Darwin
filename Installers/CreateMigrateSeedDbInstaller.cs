@@ -15,7 +15,7 @@ public static class CreateMigrateSeedDbInstaller
         {
 
             // migrate + create (if not created yet) database
-            var dbContext = serviceScope.ServiceProvider.GetRequiredService<DataContext>();
+            var dbContext = serviceScope.ServiceProvider.GetRequiredService<AppDbContext>();
             await dbContext.Database.MigrateAsync();
             await dbContext.Database.EnsureCreatedAsync();
 

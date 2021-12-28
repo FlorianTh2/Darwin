@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace hello_asp_identity.Validators;
 
-public class AccountRegisterRequestValidator : AbstractValidator<AccountRegisterRequest>
+public class AccountRegisterRequestValidator : AbstractValidator<IdentityRegisterRequest>
 {
     private readonly AccountSecruityOptions _accountSecruityOptions;
 

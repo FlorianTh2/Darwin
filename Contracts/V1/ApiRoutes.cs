@@ -8,9 +8,9 @@ public static class ApiRoutes
 
     public const string Base = Root + "/" + Version;
 
-    public static class Account
+    public static class Identity
     {
-        public const string SubBase = Base + "/" + "account";
+        public const string SubBase = Base + "/" + "identity";
 
         public const string Register = SubBase + "/register";
         public const string RegisterConfirm = SubBase + "/register_confirm";

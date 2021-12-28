@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace hello_asp_identity.Data;
 
-public class DataContext : IdentityDbContext<
+public class AppDbContext : IdentityDbContext<
     AppUser,
     AppRole,
     string,
@@ -25,8 +25,8 @@ public class DataContext : IdentityDbContext<
     private readonly ICurrentUserService _currentUserService;
     private IDateTimeService _dateTimeService;
 
-    public DataContext(
-        DbContextOptions<DataContext> options,
+    public AppDbContext(
+        DbContextOptions<AppDbContext> options,
         ICurrentUserService currentUserService,
         IDateTimeService dateTimeService)
         : base(options)

@@ -8,7 +8,7 @@ public class AppRoleEntityTypeConfiguration : IEntityTypeConfiguration<AppRole>
 {
     public void Configure(EntityTypeBuilder<AppRole> builder)
     {
-        builder.ToTable(nameof(AppRole), DataContext.DEFAULT_SCHEMA);
+        builder.ToTable(nameof(AppRole), AppDbContext.DEFAULT_SCHEMA);
 
         builder.HasKey(a => a.Id);
         builder.Property(a => a.Id).ValueGeneratedOnAdd();

@@ -8,7 +8,7 @@ public class RefreshTokenEntityTypeConfiguration : IEntityTypeConfiguration<Refr
 {
     public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
-        builder.ToTable(nameof(RefreshToken), DataContext.DEFAULT_SCHEMA);
+        builder.ToTable(nameof(RefreshToken), AppDbContext.DEFAULT_SCHEMA);
 
         builder.HasKey(a => a.Token);
         builder.Property(a => a.Token)
