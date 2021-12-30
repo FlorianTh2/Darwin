@@ -8,27 +8,28 @@ public static class ApiRoutes
 
     public const string Base = Root + "/" + Version;
 
+    // ressources
+    public const string IdentityRessource = Base + "/" + "identity";
+    public const string UserRessource = Base + "/" + "users";
+
     public static class Identity
     {
-        public const string SubBase = Base + "/" + "identity";
 
-        public const string Register = SubBase + "/register";
-        public const string RegisterConfirm = SubBase + "/register_confirm";
-        public const string Login = SubBase + "/login";
-        public const string RefreshAccessToken = SubBase + "/refresh";
-        public const string PasswordReset = SubBase + "/password_reset";
-        public const string PasswordResetConfirm = SubBase + "/password_reset/confirm";
-        public const string PasswordUpdate = SubBase + "/password_update";
-        public const string PasswordUpdateConfirm = SubBase + "/password_update/confirm";
+        public const string Register = IdentityRessource + "/register";
+        public const string RegisterConfirm = IdentityRessource + "/register_confirm";
+        public const string Login = IdentityRessource + "/login";
+        public const string RefreshAccessToken = IdentityRessource + "/refresh";
+        public const string PasswordReset = IdentityRessource + "/password_reset";
+        public const string PasswordResetConfirm = IdentityRessource + "/password_reset/confirm";
+        public const string PasswordUpdate = IdentityRessource + "/password_update";
     }
 
     public static class User
     {
-        public const string SubBase = Base + "/" + "users";
 
-        public const string GetAll = SubBase;
-        public const string Get = SubBase + "/{userId}";
-        public const string Update = SubBase + "/{userId}";
-        public const string Delete = SubBase + "/{userId}";
+        public const string GetAll = UserRessource;
+        public const string Get = UserRessource + "/{userId}";
+        public const string Update = UserRessource + "/{userId}";
+        public const string Delete = UserRessource + "/{userId}";
     }
 }

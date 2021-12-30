@@ -10,6 +10,7 @@ namespace hello_asp_identity.Controllers.V1;
 [Produces("application/json")]
 public class IdentityController : ControllerBase
 {
+    // https://github.com/aau-giraf/web-api/blob/develop/GirafRest/Controllers/AccountController.cs
     public IdentityController()
     {
 
@@ -57,16 +58,16 @@ public class IdentityController : ControllerBase
         return null;
     }
 
-    [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.PasswordUpdate)]
     public async Task<ActionResult> PasswordUpdate([FromBody] IdentityPasswordUpdateRequest request)
     {
-        return null;
-    }
+        // to identitfy user: extract userId from Token
 
-    [HttpPost(ApiRoutes.Identity.PasswordUpdateConfirm)]
-    public async Task<ActionResult> PasswordUpdateConfirm([FromBody] IdentityPasswordUpdateConfirmRequest request)
-    {
+        // var user = await UserManager.FindByIdAsync(id);
+
+        // var token = await UserManager.GeneratePasswordResetTokenAsync(user);
+
+        // var result = await UserManager.ResetPasswordAsync(user, token, "MyN3wP@ssw0rd");
         return null;
     }
 }
