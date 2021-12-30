@@ -11,6 +11,7 @@ public class AppUser : IdentityUser<string>
     public string UpdaterId { get; set; }
     public DateTime? DeletedOn { get; set; }
     public string DeleterId { get; set; }
+    public string UnConfirmedEmail { get; set; }
 
     public virtual ICollection<AppUserRole> UserRoles { get; set; }
 }
