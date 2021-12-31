@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace hello_asp_identity.Domain;
 
-public class AppUser : IdentityUser<string>
+public class AppUser : IdentityUser<Guid>
 {
     public string ConfirmedCode { get; set; }
     public bool Suspended { get; set; }

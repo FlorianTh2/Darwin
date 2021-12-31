@@ -14,23 +14,5 @@ public class AppUserEntityTypeConfiguration : IEntityTypeConfiguration<AppUser>
         builder.Property(a => a.Id).ValueGeneratedOnAdd();
 
         builder.HasMany(a => a.UserRoles).WithOne(a => a.User).HasForeignKey(a => a.UserId).IsRequired();
-
-        // builder.HasMany(a => a.AppRoles).WithMany(a => a.AppUsers).UsingEntity<AppUserRole>(
-        //     a => a
-        //         .HasOne(b => b.Role)
-        //         .WithMany(b => b.UserRoles)
-        //         .HasForeignKey(b => b.RoleId),
-        //     a => a.HasOne(b => b.User).WithMany(b => b.UserRoles).HasForeignKey(b => b.UserId),
-        //     a =>
-        //     {
-        //         a.HasKey(b => new { b.UserId, b.RoleId });
-        //     }
-        // );
-
-        // builder.HasKey(a => new { a.UserId, a.RoleId });
-
-        // builder.HasOne(a => a.User).WithMany(a => a.UserRoles).HasForeignKey(a => a.UserId);
-
-        // builder.HasOne(a => a.Role).WithMany(a => a.UserRoles).HasForeignKey(a => a.RoleId);
     }
 }

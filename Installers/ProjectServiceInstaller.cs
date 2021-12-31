@@ -6,7 +6,7 @@ public static class ProjectServiceInstaller
 {
     public static void InstallProjectServices(this IServiceCollection services)
     {
-        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IIdentityService, IdentityService>();
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IDateTimeService, DateTimeService>();
     }

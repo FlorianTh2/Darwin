@@ -20,7 +20,7 @@ public static class CreateMigrateSeedDbInstaller
             await dbContext.Database.EnsureCreatedAsync();
 
             var seedOptions = app.Configuration.GetSection(SeedOptions.SectionName).Get<SeedOptions>();
-            await DataContextSeed.SeedAsync(serviceScope.ServiceProvider, seedOptions);
+            await AppDbContextSeed.SeedAsync(serviceScope.ServiceProvider, seedOptions);
         }
     }
 }

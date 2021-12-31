@@ -20,10 +20,12 @@ public static class ApiRoutes
         public const string Login = IdentityRessource + "/login";
         public const string RefreshAccessToken = IdentityRessource + "/refresh";
         public const string PasswordReset = IdentityRessource + "/password_reset";
-        public const string PasswordResetConfirm = IdentityRessource + "/password_reset/confirm";
+        public const string PasswordResetConfirm = IdentityRessource + "/password_reset";
         public const string PasswordUpdate = IdentityRessource + "/password_update";
         public const string UsernameUpdate = IdentityRessource + "/username_update";
         public const string EmailUpdate = IdentityRessource + "/email_update";
+        public const string EmailUpdateConfirm = IdentityRessource + "/email_update";
+
     }
 
     public static class User

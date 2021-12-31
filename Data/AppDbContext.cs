@@ -11,12 +11,12 @@ namespace hello_asp_identity.Data;
 public class AppDbContext : IdentityDbContext<
     AppUser,
     AppRole,
-    string,
-    IdentityUserClaim<string>,
+    Guid,
+    IdentityUserClaim<Guid>,
     AppUserRole,
-    IdentityUserLogin<string>,
-    IdentityRoleClaim<string>,
-    IdentityUserToken<string>
+    IdentityUserLogin<Guid>,
+    IdentityRoleClaim<Guid>,
+    IdentityUserToken<Guid>
     >
 {
     public const string DEFAULT_SCHEMA = "dbo";

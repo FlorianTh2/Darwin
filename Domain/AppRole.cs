@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace hello_asp_identity.Domain;
 
-public class AppRole : IdentityRole<string>
+public class AppRole : IdentityRole<Guid>
 {
     public AppRole() : base()
     {

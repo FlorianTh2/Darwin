@@ -2,7 +2,7 @@ using hello_asp_identity.Domain;
 
 namespace hello_asp_identity.Services;
 
-public class AccountService : IAccountService
+public class IdentityService : IIdentityService
 {
     public Task<AuthenticationResult> RegisterAsync(string username, string email, string password)
     {

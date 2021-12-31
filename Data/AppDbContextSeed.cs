@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace hello_asp_identity.Data;
 
-public static class DataContextSeed
+public static class AppDbContextSeed
 {
     public static async Task SeedAsync(IServiceProvider serviceProvider, SeedOptions seedOptions)
     {

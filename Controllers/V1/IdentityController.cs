@@ -1,7 +1,10 @@
 using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Contracts.V1.Responses;
+using hello_asp_identity.Data;
+using hello_asp_identity.Domain;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace hello_asp_identity.Controllers.V1;
@@ -11,15 +14,27 @@ namespace hello_asp_identity.Controllers.V1;
 [Produces("application/json")]
 public class IdentityController : ControllerBase
 {
-    // https://github.com/aau-giraf/web-api/blob/develop/GirafRest/Controllers/AccountController.cs
-    public IdentityController()
-    {
+    private readonly UserManager<AppUser> _userManager;
+    private readonly SignInManager<AppUser> _signInManager;
+    private readonly AppDbContext _dbContext;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
+    // https://github.com/aau-giraf/web-api/blob/develop/GirafRest/Controllers/AccountController.cs
+    public IdentityController(
+        UserManager<AppUser> userManager,
+        SignInManager<AppUser> signInManager,
+        AppDbContext dbContext,
+        IHttpContextAccessor httpContextAccessor)
+    {
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _dbContext = dbContext;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.Register, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<BaseResponse>>> Register([FromBody] IdentityRegisterRequest request)
+    public async Task<ActionResult<Response>> Register([FromBody] IdentityRegisterRequest request)
     {
         return null;
     }
@@ -47,20 +62,20 @@ public class IdentityController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.PasswordReset, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<BaseResponse>>> PasswordReset([FromBody] IdentityPasswordResetRequest request)
+    public async Task<ActionResult<Response>> PasswordReset([FromBody] IdentityPasswordResetRequest request)
     {
         return Ok();
     }
 
     [AllowAnonymous]
-    [HttpPost(ApiRoutes.Identity.PasswordResetConfirm, Name = "[controller]_[action]")]
-    public async Task<ActionResult<BaseResponse>> PasswordResetConfirm([FromBody] IdentityPasswordResetConfirmRequest request)
+    [HttpGet(ApiRoutes.Identity.PasswordResetConfirm, Name = "[controller]_[action]")]
+    public async Task<ActionResult<Response>> PasswordResetConfirm([FromQuery] IdentityPasswordResetConfirmRequest request)
     {
         return null;
     }
 
-    [HttpPost(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<BaseResponse>>> PasswordUpdate([FromBody] IdentityPasswordUpdateRequest request)
+    [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
+    public async Task<ActionResult<Response>> PasswordUpdate([FromBody] IdentityPasswordUpdateRequest request)
     {
         // to identitfy user: extract userId from Token
 
@@ -72,33 +87,33 @@ public class IdentityController : ControllerBase
         return null;
     }
 
-    [HttpPost(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<BaseResponse>>> UsernameUpdate([FromBody] IdentityUsernameUpdateRequest request)
+    [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
+    public async Task<ActionResult<Response>> UsernameUpdate([FromBody] IdentityUsernameUpdateRequest request)
     {
         return null;
     }
 
-    [HttpPost(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult> EmailUpdate([FromBody] IdentityEmailUpdateRequest request)
+    [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
+    public async Task<ActionResult<Response>> EmailUpdate([FromBody] IdentityEmailUpdateRequest request)
     {
         return null;
     }
 
-    [HttpPost(ApiRoutes.Identity.EmailUpdateConfirm, Name = "[controller]_[action]")]
-    public async Task<ActionResult> EmailUpdateConfirm([FromBody] IdentityEmailUpdateConfirmRequest request)
+    [HttpGet(ApiRoutes.Identity.EmailUpdateConfirm, Name = "[controller]_[action]")]
+    public async Task<ActionResult<Response>> EmailUpdateConfirm([FromQuery] IdentityEmailUpdateConfirmRequest request)
     {
         // SendEmailConfirmationWarningAsync
         return null;
     }
 
-    private async Task<string> SendEmailConfirmationWarningAsync(string userID, string subject)
-    {
-        string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
-        var callbackUrl = Url.Action("ConfirmEmail", "Account",
-           new { userId = userID, code = code }, protocol: Request.Url.Scheme);
-        await UserManager.SendEmailAsync(userID, subject,
-           "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+    // private async Task<string> SendEmailConfirmationWarningAsync(string userID, string subject)
+    // {
+    //     string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
+    //     var callbackUrl = Url.Action("ConfirmEmail", "Account",
+    //        new { userId = userID, code = code }, protocol: Request.Url.Scheme);
+    //     await UserManager.SendEmailAsync(userID, subject,
+    //        "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-        return callbackUrl;
-    }
+    //     return callbackUrl;
+    // }
 }
