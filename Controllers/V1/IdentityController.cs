@@ -75,7 +75,7 @@ public class IdentityController : ControllerBase
     }
 
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> PasswordUpdate([FromBody] IdentityPasswordUpdateRequest request)
+    public async Task<ActionResult<Response>> PasswordUpdate([FromRoute] Guid userId, [FromBody] IdentityPasswordUpdateRequest request)
     {
         // to identitfy user: extract userId from Token
 
@@ -88,13 +88,13 @@ public class IdentityController : ControllerBase
     }
 
     [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> UsernameUpdate([FromBody] IdentityUsernameUpdateRequest request)
+    public async Task<ActionResult<Response>> UsernameUpdate([FromRoute] Guid userId, [FromBody] IdentityUsernameUpdateRequest request)
     {
         return null;
     }
 
     [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> EmailUpdate([FromBody] IdentityEmailUpdateRequest request)
+    public async Task<ActionResult<Response>> EmailUpdate([FromRoute] Guid userId, [FromBody] IdentityEmailUpdateRequest request)
     {
         return null;
     }

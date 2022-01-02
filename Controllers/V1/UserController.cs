@@ -11,30 +11,31 @@ namespace hello_asp_identity.Controllers.V1;
 [Produces("application/json")]
 public class UserController : ControllerBase
 {
-    public UserController()
+    private readonly IUserService _userService;
+    public UserController(IUserService userService)
     {
-
+        _userService = userService;
     }
 
-    [HttpGet(ApiRoutes.User.GetAll)]
+    [HttpGet(ApiRoutes.User.GetAll, Name = "[controller]_[action]")]
     public async Task<IActionResult> GetAll(/* [FromQuery] GetAllUsersQuery query, [FromQuery] PaginationQuery paginationQuery */)
     {
         return null;
     }
 
-    [HttpGet(ApiRoutes.User.Get)]
+    [HttpGet(ApiRoutes.User.Get, Name = "[controller]_[action]")]
     public async Task<IActionResult> Get([FromRoute] Guid userId)
     {
         return null;
     }
 
-    [HttpPut(ApiRoutes.User.Update)]
+    [HttpPut(ApiRoutes.User.Update, Name = "[controller]_[action]")]
     public async Task<IActionResult> Update([FromRoute] Guid userId, [FromBody] UserUpdateRequest request)
     {
         return null;
     }
 
-    [HttpDelete(ApiRoutes.User.Delete)]
+    [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]
     public async Task<IActionResult> Delete([FromRoute] Guid userId)
     {
         return null;
