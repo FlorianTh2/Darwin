@@ -1,65 +1,111 @@
+using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
+using hello_asp_identity.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace hello_asp_identity.Services;
 
-public class UserService : IUserService{
+public class UserService : IUserService
+{
 
     private readonly AppDbContext _dbContext;
 
-    public UserService(AppDbContext dbContext){
+    public UserService(AppDbContext dbContext)
+    {
         _dbContext = dbContext;
     }
 
-    public async Task<GetProjectsAsyncServiceResponse> GetUsersAsync(){
+    public async Task<GetAllAsyncServiceResponse<AppUser>> GetUsersAsync(
+        GetAllUsersFilter filter = null,
+        PaginationFilter paginationFilter = null
+    )
+    {
+        var queryable = _dbContext
+        .Users
+        .Include(a => a.UserRoles)
+        .ThenInclude(a => a.Role)
+        .AsQueryable();
 
-    }
+        queryable = AddFiltersOnQuery(filter, queryable);
 
-    public Task<AppUser> GetUserByIdAsync(Guid userId){
+        var skip = (paginationFilter.PageNumber - 1) * paginationFilter.PageSize;
 
-
-
-            return await _dataContext.Projects
-                .SingleOrDefaultAsync(a => a.Id == projectId);
-
-                    // var user = await _userManager.FindByIdAsync(id.ToString());
-            // var userRoles = await _userManager.GetRolesAsync(user);
-
-            var user = await Context.Users
+        var serviceResponse = new GetAllAsyncServiceResponse<AppUser>()
+        {
+            TotalNumber = await queryable
                 .AsNoTracking()
-                .Include(a => a.UserRoles)
-                .ThenInclude(a => a.Role)
-                .Include(a => a.Files)
-                .SingleOrDefaultAsync(a => a.Id == id);
+                .LongCountAsync(),
+            Data = await queryable
+                .AsNoTracking()
+                .OrderByDescending(a => a.CreatedOn)
+                .Skip(skip)
+                .Take(paginationFilter.PageSize)
+                .ToListAsync(),
+        };
 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(new ServiceResponseViewModel<UsersResponse>(new UsersResponse()
-            {
-                Id = user.Id,
-                Username = user.UserName,
-                Salutation = user.Salutation,
-                Firstname = user.Firstname,
-                Lastname = user.Lastname,
-                Created = user.Created,
-                Confirmed = user.Confirmed,
-                Unlocked = user.Unlocked,
-                DepartmentName = user.DepartmentName,
-                AuthorityName = user.AuthorityName,
-                Company = user.Company,
-                Roles = user.UserRoles.Select(c => c.Role.Name),
-                FileIds = user.Files.Select(c => c.Id)
-            }));
-
+        return serviceResponse;
     }
 
-    public Task<bool> UpdateUserInDatabase(){
-
+    public async Task<AppUser> GetUserByIdAsync(Guid userId)
+    {
+        return await _dbContext.Users
+            .AsNoTracking()
+            .Include(a => a.UserRoles)
+            .ThenInclude(a => a.Role)
+            .FirstOrDefaultAsync(a => a.Id == userId);
     }
 
-    public Task<bool> DeleteUserByIdAsync(Guid userId){
+    public async Task<bool> UpdateUserAsync(AppUser userToUpdate)
+    {
+        _dbContext.Users.Update(userToUpdate);
+        var updated = await _dbContext.SaveChangesAsync();
+        return updated > 0;
+    }
 
+    public async Task<bool> DeleteUserByIdAsync(Guid userId)
+    {
+        var user = await GetUserByIdAsync(userId);
+
+        if (user == null)
+            return false;
+
+        _dbContext.Users.Remove(user);
+        var deleted = await _dbContext.SaveChangesAsync();
+        return deleted > 0;
+    }
+
+    private IQueryable<AppUser> AddFiltersOnQuery(
+        GetAllUsersFilter filter,
+        IQueryable<AppUser> queryable
+    )
+    {
+        // filter currently no implemented
+        // if (!string.IsNullOrEmpty(filter?.UserId))
+        // {
+        //     queryable.Where(a => a.UserId == filter.UserId);
+        // }
+
+        return queryable;
+    }
+
+    public async Task<bool> UserOwnsUserAsync(Guid userId, string userIdRequestAuthor)
+    {
+        var user = await _dbContext
+            .Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.Id == userId);
+
+        if (user == null)
+        {
+            return false;
+        }
+
+        if (user.Id.ToString() != userIdRequestAuthor)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

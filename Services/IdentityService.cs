@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
+using hello_asp_identity.Entities;
 using hello_asp_identity.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;

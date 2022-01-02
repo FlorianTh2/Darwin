@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace hello_asp_identity.Extensions;

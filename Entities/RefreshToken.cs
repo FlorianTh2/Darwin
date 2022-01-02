@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace hello_asp_identity.Domain;
+namespace hello_asp_identity.Entities;
 
 public class RefreshToken
 {

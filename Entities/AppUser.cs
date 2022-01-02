@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace hello_asp_identity.Domain;
+namespace hello_asp_identity.Entities;
 
 public class AppUser : IdentityUser<Guid>
 {
+    public int Age { get; set; }
     public string ConfirmedCode { get; set; }
     public bool Suspended { get; set; }
     public DateTime CreatedOn { get; set; }

@@ -1,10 +1,9 @@
 using hello_asp_identity.Data.EntityConfigurations;
-using hello_asp_identity.Domain;
+using hello_asp_identity.Entities;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace hello_asp_identity.Data;
 

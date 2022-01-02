@@ -1,7 +1,7 @@
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Identity;
 
-namespace hello_asp_identity.Domain;
+namespace hello_asp_identity.Entities;
 
 public class AppRole : IdentityRole<Guid>
 {
