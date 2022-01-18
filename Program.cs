@@ -13,6 +13,7 @@ builder.Services.InstallJwt(builder.Configuration);
 builder.Services.InstallMvc();
 builder.Services.InstallAutomapper();
 builder.Services.InstallSwagger();
+builder.Services.InstallCors();
 
 // builder.Logging.ClearProviders();
 // builder.Logging.AddConsole();

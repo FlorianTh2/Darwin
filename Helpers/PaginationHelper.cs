@@ -13,7 +13,7 @@ public class PaginationHelper
         PaginationFilter paginationFilter,
         List<T> response,
         long totalCount
-    )
+    ) where T : class
     {
         // if paginationfilter is wrong
         if (paginationFilter == null || paginationFilter.PageNumber < 1 || paginationFilter.PageSize < 1)

@@ -11,7 +11,7 @@ public static class DbInstaller
     {
         services.AddHttpContextAccessor();
 
-        string connectionString = config.GetSection(ConnectionStringOptions.SectionName).Get<ConnectionStringOptions>().Local;
+        string connectionString = config.GetSection(ConnectionStringOptions.SectionName).Get<ConnectionStringOptions>().PostgresLocal;
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(
                 connectionString,
