@@ -12,6 +12,7 @@ public static class RequestPipelineInstaller
                 a.SwaggerEndpoint("v1/swagger.json", "hello-asp-identity (V1)");
             });
         }
+        app.UseHealthChecks("/health");
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseAuthentication();

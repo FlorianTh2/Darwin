@@ -4,6 +4,8 @@ using hello_asp_identity.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Log.Information("Starting web host");
+
 // add services
 builder.Services.InstallOptions(builder.Configuration);
 builder.Services.InstallProjectServices();
@@ -14,9 +16,7 @@ builder.Services.InstallMvc();
 builder.Services.InstallAutomapper();
 builder.Services.InstallSwagger();
 builder.Services.InstallCors();
-
-// builder.Logging.ClearProviders();
-// builder.Logging.AddConsole();
+builder.Host.InstallSerilog();
 
 var app = builder.Build();
 app.InstallCreateMigrateSeedDb();
