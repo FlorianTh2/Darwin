@@ -50,4 +50,9 @@ public class AppDbContext : IdentityDbContext<
         var result = await base.SaveChangesAsync(cancellationToken);
         return result;
     }
+
+    public override int SaveChanges()
+    {
+        return SaveChangesAsync().GetAwaiter().GetResult();
+    }
 }

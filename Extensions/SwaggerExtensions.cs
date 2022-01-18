@@ -5,9 +5,9 @@ namespace hello_asp_identity.Extensions;
 
 public static class SwaggerExtensions
 {
-    public static void AdjustSchemaIds(this SwaggerGenOptions swaggerGenOptions)
+    public static void AdjustSchemaIds(this SwaggerGenOptions a)
     {
-        swaggerGenOptions.CustomSchemaIds(currentClass =>
+        a.CustomSchemaIds(currentClass =>
         {
             string customSuffix = "Response";
             var tmpDisplayName = currentClass.ShortDisplayName().Replace("<", "").Replace(">", "");

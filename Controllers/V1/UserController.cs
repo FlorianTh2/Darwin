@@ -72,7 +72,7 @@ public class UserController : ControllerBase
         var user = await _userService.GetUserByIdAsync(userId);
 
         // following properties can be updated currently:
-        user.DOB = DateTime.Parse(request.DOB, null, System.Globalization.DateTimeStyles.RoundtripKind);
+        user.DOB = request.DOB.FromIso8601StringToDateTime();
 
         var updated = await _userService.UpdateUserAsync(user);
 
