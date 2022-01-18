@@ -4,7 +4,7 @@ namespace hello_asp_identity.Entities;
 
 public class AppUser : IdentityUser<int>, IEntity<int>
 {
-    public int Age { get; set; }
+    public DateTime DOB { get; set; }
     public string ConfirmedCode { get; set; }
     public bool Suspended { get; set; }
     public string UnConfirmedEmail { get; set; }

@@ -57,7 +57,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPut(ApiRoutes.User.Update, Name = "[controller]_[action]")]
-    public async Task<IActionResult> Update([FromRoute] Guid userId, [FromBody] UserUpdateRequest request)
+    public async Task<IActionResult> Update([FromRoute] int userId, [FromBody] UserUpdateRequest request)
     {
         var userOwnsUser = await _userService.UserOwnsUserAsync(userId, HttpContext.GetUserId());
 
@@ -72,7 +72,7 @@ public class UserController : ControllerBase
         var user = await _userService.GetUserByIdAsync(userId);
 
         // following properties can be updated currently:
-        user.Age = request.Age;
+        user.DOB = DateTime.Parse(request.DOB, null, System.Globalization.DateTimeStyles.RoundtripKind);
 
         var updated = await _userService.UpdateUserAsync(user);
 
@@ -83,7 +83,7 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]
-    public async Task<IActionResult> Delete([FromRoute] Guid userId)
+    public async Task<IActionResult> Delete([FromRoute] int userId)
     {
         var userOwnsUser = await _userService.UserOwnsUserAsync(userId, HttpContext.GetUserId());
 

@@ -47,7 +47,7 @@ public class UserService : IUserService
         return serviceResponse;
     }
 
-    public async Task<AppUser> GetUserByIdAsync(Guid userId)
+    public async Task<AppUser> GetUserByIdAsync(int userId)
     {
         return await _dbContext.Users
             .AsNoTracking()
@@ -63,7 +63,7 @@ public class UserService : IUserService
         return updated > 0;
     }
 
-    public async Task<bool> DeleteUserByIdAsync(Guid userId)
+    public async Task<bool> DeleteUserByIdAsync(int userId)
     {
         var user = await GetUserByIdAsync(userId);
 
@@ -89,7 +89,7 @@ public class UserService : IUserService
         return queryable;
     }
 
-    public async Task<bool> UserOwnsUserAsync(Guid userId, string userIdRequestAuthor)
+    public async Task<bool> UserOwnsUserAsync(int userId, string userIdRequestAuthor)
     {
         var user = await _dbContext
             .Users

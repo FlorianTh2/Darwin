@@ -10,11 +10,11 @@ public interface IUserService
         PaginationFilter paginationFilter = null
     );
 
-    Task<AppUser> GetUserByIdAsync(Guid userId);
+    Task<AppUser> GetUserByIdAsync(int userId);
 
     Task<bool> UpdateUserAsync(AppUser userToUpdate);
 
-    Task<bool> DeleteUserByIdAsync(Guid userId);
+    Task<bool> DeleteUserByIdAsync(int userId);
 
-    Task<bool> UserOwnsUserAsync(Guid userId, string userIdRequestAuthor);
+    Task<bool> UserOwnsUserAsync(int userId, string userIdRequestAuthor);
 }
