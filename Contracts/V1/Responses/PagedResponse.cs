@@ -1,6 +1,6 @@
 namespace hello_asp_identity.Contracts.V1.Responses;
 
-public record PagedResponse<T> : BaseResponse
+public record PagedResponse<T> : Response
 {
     public IEnumerable<T> Data { get; init; }
 

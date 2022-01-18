@@ -1,4 +1,4 @@
-using hello_asp_identity.Helper;
+using hello_asp_identity.Helpers;
 using hello_asp_identity.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

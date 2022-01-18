@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace hello_asp_identity.Filter;
+namespace hello_asp_identity.Filters;
 
 public class ValidationFilter : IAsyncActionFilter
 {

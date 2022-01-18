@@ -1,4 +1,4 @@
-using hello_asp_identity.Domain;
+using hello_asp_identity.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

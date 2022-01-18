@@ -2,7 +2,7 @@ using System.Text;
 using hello_asp_identity.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace hello_asp_identity.Helper;
+namespace hello_asp_identity.Helpers;
 
 public class JwtHelper
 {

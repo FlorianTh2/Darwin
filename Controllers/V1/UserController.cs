@@ -1,8 +1,10 @@
+using AutoMapper;
 using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Contracts.V1.Responses;
 using hello_asp_identity.Domain;
 using hello_asp_identity.Extensions;
+using hello_asp_identity.Helpers;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +16,21 @@ namespace hello_asp_identity.Controllers.V1;
 [Produces("application/json")]
 public class UserController : ControllerBase
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IMapper _mapper;
+    private readonly IUriService _uriService;
     private readonly IUserService _userService;
 
-    public UserController(IUserService userService)
+    public UserController(
+        IHttpContextAccessor httpContextAccessor,
+        IMapper mapper,
+        IUriService uriService,
+        IUserService userService
+    )
     {
+        _httpContextAccessor = httpContextAccessor;
+        _mapper = mapper;
+        _uriService = uriService;
         _userService = userService;
     }
 
@@ -31,15 +44,9 @@ public class UserController : ControllerBase
         var filter = _mapper.Map<GetAllUsersFilter>(query);
 
         var serviceResponse = await _userService.GetUsersAsync(filter, paginationFilter);
-        var usersResponse = _mapper.Map<List<UserResponse>>(serviceResponse.);
+        var usersResponse = _mapper.Map<List<UserResponse>>(serviceResponse.Data);
 
-        // return perma with PaginationHelpers to have a unified approach
-        if (paginationFilter == null || paginationFilter.PageNumber < 1 || paginationFilter.PageSize < 1)
-        {
-            return Ok(new PagedResponse<UserResponse>(usersResponse));
-        }
-
-        return Ok(PaginationHelpers.CreatePaginatedResponse(_uriService, ApiRoutes.User.GetAll, paginationFilter, usersResponse, serviceResponse.TotalProjects));
+        return Ok(PaginationHelper.CreatePaginatedResponse(_uriService, ApiRoutes.User.GetAll, paginationFilter, usersResponse, serviceResponse.TotalNumber));
 
     }
 

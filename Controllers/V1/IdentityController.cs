@@ -1,8 +1,10 @@
+using AutoMapper;
 using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Contracts.V1.Responses;
 using hello_asp_identity.Data;
-using hello_asp_identity.Domain;
+using hello_asp_identity.Entities;
+using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,24 +20,30 @@ public class IdentityController : ControllerBase
     private readonly SignInManager<AppUser> _signInManager;
     private readonly AppDbContext _dbContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IMapper _mapper;
 
     // https://github.com/aau-giraf/web-api/blob/develop/GirafRest/Controllers/AccountController.cs
     public IdentityController(
+        IHttpContextAccessor httpContextAccessor,
+        IMapper mapper,
+        IUriService uriService,
         UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
-        AppDbContext dbContext,
-        IHttpContextAccessor httpContextAccessor)
+        AppDbContext dbContext
+        )
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _dbContext = dbContext;
         _httpContextAccessor = httpContextAccessor;
+        _mapper = mapper;
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.Register, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response>> Register([FromBody] IdentityRegisterRequest request)
     {
+
         return null;
     }
 

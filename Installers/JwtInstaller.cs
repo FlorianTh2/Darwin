@@ -1,5 +1,5 @@
 using System.Text;
-using hello_asp_identity.Helper;
+using hello_asp_identity.Helpers;
 using hello_asp_identity.Options;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
