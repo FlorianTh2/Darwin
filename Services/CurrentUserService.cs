@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+
 namespace hello_asp_identity.Services;
 
 public class CurrentUserService : ICurrentUserService
@@ -13,8 +15,7 @@ public class CurrentUserService : ICurrentUserService
     {
         get
         {
-            var userId = _httpContextAccessor.HttpContext?.User?.Claims?.Single(a => a.Type == "id")?.Value;
-            return userId;
+            return _httpContextAccessor.HttpContext?.User?.Claims?.First(a => a.Type == JwtRegisteredClaimNames.Sub)?.Value;
         }
     }
 }

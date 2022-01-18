@@ -6,6 +6,7 @@ using hello_asp_identity.Domain;
 using hello_asp_identity.Entities;
 using hello_asp_identity.Options;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -128,5 +129,18 @@ public class IdentityService : IIdentityService
             Token = tokenHandler.WriteToken(token),
             RefreshToken = refreshToken.Token
         };
+    }
+    public async Task<string> GetUserNameAsync(int userId)
+    {
+        var user = await _userManager.Users.FirstAsync(u => u.Id == userId);
+
+        return user.UserName;
+    }
+
+    public async Task<bool> IsInRoleAsync(int userId, string role)
+    {
+        var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
+
+        return user != null && await _userManager.IsInRoleAsync(user, role);
     }
 }

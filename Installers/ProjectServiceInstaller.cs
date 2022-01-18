@@ -6,7 +6,7 @@ public static class ProjectServiceInstaller
 {
     public static void InstallProjectServices(this IServiceCollection services)
     {
-        services.AddSingleton<IUriService>(provider =>
+        services.AddScoped<IUriService>(provider =>
         {
             var request = provider.GetRequiredService<IHttpContextAccessor>()
                 .HttpContext?

@@ -20,18 +20,21 @@ public class UserController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IUriService _uriService;
     private readonly IUserService _userService;
+    private readonly ICurrentUserService _currentUserService;
 
     public UserController(
         IHttpContextAccessor httpContextAccessor,
         IMapper mapper,
         IUriService uriService,
-        IUserService userService
+        IUserService userService,
+        ICurrentUserService currentUserService
     )
     {
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
         _uriService = uriService;
         _userService = userService;
+        _currentUserService = currentUserService;
     }
 
     [HttpGet(ApiRoutes.User.GetAll, Name = "[controller]_[action]")]
@@ -59,7 +62,7 @@ public class UserController : ControllerBase
     [HttpPut(ApiRoutes.User.Update, Name = "[controller]_[action]")]
     public async Task<IActionResult> Update([FromRoute] int userId, [FromBody] UserUpdateRequest request)
     {
-        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, HttpContext.GetUserId());
+        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId);
 
         if (!userOwnsUser)
         {
@@ -85,7 +88,7 @@ public class UserController : ControllerBase
     [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]
     public async Task<IActionResult> Delete([FromRoute] int userId)
     {
-        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, HttpContext.GetUserId());
+        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId);
 
         if (!userOwnsUser)
         {

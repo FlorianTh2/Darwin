@@ -2,13 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- <NoWarn>$(NoWarn);1591</NoWarn> -->
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>hello_asp_identity</RootNamespace>
-  </PropertyGroup>
-
-    <PropertyGroup>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

@@ -13,6 +13,7 @@ public static class RequestPipelineInstaller
             });
         }
         app.UseHttpsRedirection();
+        app.UseStaticFiles();
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();

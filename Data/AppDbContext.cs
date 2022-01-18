@@ -1,3 +1,4 @@
+using System.Reflection;
 using hello_asp_identity.Data.EntityConfigurations;
 using hello_asp_identity.Entities;
 using hello_asp_identity.Services;
@@ -37,16 +38,28 @@ public class AppDbContext : IdentityDbContext<
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
         builder.HasDefaultSchema(DEFAULT_SCHEMA);
-
-        builder.ApplyConfiguration(new AppUserEntityTypeConfiguration());
-        builder.ApplyConfiguration(new AppRoleEntityTypeConfiguration());
-        builder.ApplyConfiguration(new RefreshTokenEntityTypeConfiguration());
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
+        foreach (var entry in ChangeTracker.Entries<IEntity<int>>())
+        {
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.CreatorId = _currentUserService.UserId;
+                    entry.Entity.CreatedOn = _dateTimeService.Now;
+                    break;
+
+                case EntityState.Modified:
+                    entry.Entity.UpdaterId = _currentUserService.UserId;
+                    entry.Entity.UpdatedOn = _dateTimeService.Now;
+                    break;
+            }
+        }
+
         var result = await base.SaveChangesAsync(cancellationToken);
         return result;
     }

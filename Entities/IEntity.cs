@@ -7,5 +7,4 @@ public interface IEntity<T>
     public string? CreatorId { get; set; }
     public DateTime? UpdatedOn { get; set; }
     public string? UpdaterId { get; set; }
-
 }

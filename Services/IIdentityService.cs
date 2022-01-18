@@ -9,4 +9,8 @@ public interface IIdentityService
     Task<AuthenticationResult> RegisterAsync(string username, string email, string password);
     Task<AuthenticationResult> LoginAsync(string username, string password);
     Task<AuthenticationResult> RefreshTokenAsync(string token, string refreshToken);
+
+    Task<string> GetUserNameAsync(int userId);
+
+    Task<bool> IsInRoleAsync(int userId, string role);
 }
