@@ -10,7 +10,8 @@ public class RefreshTokenEntityTypeConfiguration : IEntityTypeConfiguration<Refr
     {
         builder.ToTable(nameof(RefreshToken), AppDbContext.DEFAULT_SCHEMA);
 
-        builder.HasKey(a => a.Token);
+        builder.HasKey(a => a.Id);
+
         builder.Property(a => a.Token)
             .ValueGeneratedOnAdd();
 
