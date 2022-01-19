@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 namespace hello_asp_identity.Services;
 
@@ -20,6 +21,8 @@ public class IdentityService : IIdentityService
     private readonly AppDbContext _dbContext;
     private readonly JwtOptions _jwtOptions;
     private readonly IDateTimeService _dateTimeService;
+
+    // private readonly Serilog.ILogger _log = Log.ForContext<IdentityService>();
 
     public IdentityService(
         UserManager<AppUser> userManager,

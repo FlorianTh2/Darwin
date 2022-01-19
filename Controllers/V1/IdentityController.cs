@@ -8,6 +8,7 @@ using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace hello_asp_identity.Controllers.V1;
 
@@ -22,7 +23,8 @@ public class IdentityController : ControllerBase
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
 
-    // https://github.com/aau-giraf/web-api/blob/develop/GirafRest/Controllers/AccountController.cs
+    private readonly Serilog.ILogger _log = Log.ForContext<IdentityController>();
+
     public IdentityController(
         IHttpContextAccessor httpContextAccessor,
         IMapper mapper,
@@ -41,31 +43,31 @@ public class IdentityController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.Register, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> Register([FromBody] IdentityRegisterRequest request)
+    public async Task<ActionResult<Response<RegisterResponse>>> Register([FromBody] IdentityRegisterRequest request)
     {
-
-        return null;
+        Log.Information("Processed {@request}", request);
+        return Ok(new Response<RegisterResponse>(new RegisterResponse { Description = "Started registration" }));
     }
 
     [AllowAnonymous]
     [HttpGet(ApiRoutes.Identity.RegisterConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> RegisterConfirm([FromQuery] IdentityRegisterConfirmRequest request)
     {
-        return null;
+        return Ok();
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.Login, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> Login([FromBody] IdentityLoginRequest request)
     {
-        return null;
+        return Ok();
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.RefreshAccessToken, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> RefreshAccessToken([FromBody] IdentityRefreshAccessTokenRequest request)
     {
-        return null;
+        return Ok();
     }
 
     [AllowAnonymous]
@@ -79,7 +81,7 @@ public class IdentityController : ControllerBase
     [HttpGet(ApiRoutes.Identity.PasswordResetConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response>> PasswordResetConfirm([FromQuery] IdentityPasswordResetConfirmRequest request)
     {
-        return null;
+        return Ok();
     }
 
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
@@ -92,26 +94,26 @@ public class IdentityController : ControllerBase
         // var token = await UserManager.GeneratePasswordResetTokenAsync(user);
 
         // var result = await UserManager.ResetPasswordAsync(user, token, "MyN3wP@ssw0rd");
-        return null;
+        return Ok();
     }
 
     [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response>> UsernameUpdate([FromRoute] Guid userId, [FromBody] IdentityUsernameUpdateRequest request)
     {
-        return null;
+        return Ok();
     }
 
     [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response>> EmailUpdate([FromRoute] Guid userId, [FromBody] IdentityEmailUpdateRequest request)
     {
-        return null;
+        return Ok();
     }
 
     [HttpGet(ApiRoutes.Identity.EmailUpdateConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response>> EmailUpdateConfirm([FromQuery] IdentityEmailUpdateConfirmRequest request)
     {
         // SendEmailConfirmationWarningAsync
-        return null;
+        return Ok();
     }
 
     // private async Task<string> SendEmailConfirmationWarningAsync(string userID, string subject)

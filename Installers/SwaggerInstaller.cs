@@ -23,7 +23,7 @@ public static class SwaggerInstaller
                 Type = SecuritySchemeType.ApiKey,
             });
 
-            var xmlFile = Assembly.GetExecutingAssembly().GetName().Name.ToString() + ".xml";
+            var xmlFile = Assembly.GetExecutingAssembly().GetName().Name?.ToString() + ".xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             a.IncludeXmlComments(xmlPath);
         });

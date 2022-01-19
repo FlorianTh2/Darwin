@@ -6,5 +6,5 @@ public interface IUriService
 {
     Uri GetUri(string apiRoute, string id);
 
-    Uri GetAllUri(string apiRoute, PaginationQuery pagination = null);
+    Uri GetAllUri(string apiRoute, PaginationQuery? pagination = null);
 }

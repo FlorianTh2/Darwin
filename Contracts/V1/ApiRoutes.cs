@@ -12,6 +12,8 @@ public static class ApiRoutes
     public const string IdentityRessource = Base + "/" + "identity";
     public const string UserRessource = Base + "/" + "users";
 
+    public const string TestRessource = Base + "/" + "test";
+
     public static class Identity
     {
 

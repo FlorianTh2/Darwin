@@ -1,10 +1,10 @@
 cd Hello.WebApi
-dotnet ef migrations add "AdjustedContext" --context DataContext -o .\Data\Migrations # --project "Hello.WebApi"
+dotnet ef migrations add "AdjustedContext" --context AppDbContext -o .\Data\Migrations # --project "Hello.WebApi"
 
 cd Hello.WebApi
-dotnet ef database update --context DataContext # --project "Hello.WebApi"
+dotnet ef database update --context AppDbContext # --project "Hello.WebApi"
 
-dotnet ef database update --context DataContext –TargetMigration: "20212342332_AddedToContext" # --project "Hello.WebApi" # before -targetmigration
+dotnet ef database update --context AppDbContext –TargetMigration: "20212342332_AddedToContext" # --project "Hello.WebApi" # before -targetmigration
 
 dotnet ef migrations remove
 

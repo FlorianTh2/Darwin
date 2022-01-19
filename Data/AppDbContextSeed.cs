@@ -29,7 +29,8 @@ public static class AppDbContextSeed
         var administrator = new AppUser()
         {
             UserName = adminOptions.Username,
-            Email = adminOptions.Email
+            Email = adminOptions.Email,
+            DOB = new DateTime(1970, 1, 1)
         };
 
         if (userManager.Users.All(u => u.Email != administrator.Email))

@@ -24,5 +24,6 @@ public static class RequestPipelineInstaller
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
+
     }
 }

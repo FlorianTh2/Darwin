@@ -11,7 +11,7 @@ public static class ProjectServiceInstaller
             var request = provider.GetRequiredService<IHttpContextAccessor>()
                 .HttpContext?
                 .Request;
-            var absoluteUri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent(), "/");
+            var absoluteUri = string.Concat(request?.Scheme, "://", request?.Host.ToUriComponent(), "/");
             return new UriService(absoluteUri);
         });
         services.AddScoped<IIdentityService, IdentityService>();

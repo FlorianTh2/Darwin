@@ -5,7 +5,7 @@ namespace hello_asp_identity.Extensions;
 
 public static class UserManagerExtension
 {
-    public static string FindIdByEmailConfirmationToken(
+    public static string? FindIdByEmailConfirmationToken(
         this UserManager<AppUser> manager,
         string token_code
     )

@@ -20,7 +20,7 @@ public class AppDbContext : IdentityDbContext<
     >
 {
     public const string DEFAULT_SCHEMA = "dbo";
-    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     private readonly ICurrentUserService _currentUserService;
     private IDateTimeService _dateTimeService;

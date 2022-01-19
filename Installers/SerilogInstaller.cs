@@ -1,6 +1,4 @@
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
 using Serilog.Extensions.Hosting;
 
 namespace hello_asp_identity.Installers;
@@ -22,9 +20,13 @@ public static class SerilogInstaller
             .UseSerilog((context, config) =>
             {
                 config
+                    .MinimumLevel.Override(
+                        "Microsoft.EntityFrameworkCore.Database.Command",
+                        Serilog.Events.LogEventLevel.Warning)
+                    // .Enrich.WithProperty("app", context.HostingEnvironment.ApplicationName)
                     .Enrich.FromLogContext()
                     .Enrich.WithMachineName()
-                    .WriteTo.Console()
+                    .WriteTo.Console(new Serilog.Formatting.Json.JsonFormatter())
                     .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
                     .ReadFrom.Configuration(context.Configuration);
             });

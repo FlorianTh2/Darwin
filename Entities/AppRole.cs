@@ -10,12 +10,12 @@ public class AppRole : IdentityRole<int>, IEntity<int>
 
     }
 
-    public string Comment { get; set; }
+    public string Comment { get; set; } = string.Empty;
 
-    public string CreatorId { get; set; }
     public DateTime CreatedOn { get; set; }
+    public string? CreatorId { get; set; }
     public DateTime? UpdatedOn { get; set; }
-    public string UpdaterId { get; set; }
+    public string? UpdaterId { get; set; }
 
-    public virtual ICollection<AppUserRole> UserRoles { get; set; }
+    public virtual IEnumerable<AppUserRole> UserRoles { get; set; } = new List<AppUserRole>();
 }

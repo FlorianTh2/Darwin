@@ -19,7 +19,7 @@ public class UriService : IUriService
         return new Uri(_baseUri + Regex.Replace(apiRoute, "{.*?}", id));
     }
 
-    public Uri GetAllUri(string apiRoute, PaginationQuery pagination = null)
+    public Uri GetAllUri(string apiRoute, PaginationQuery? pagination = null)
     {
         var uri = new Uri(_baseUri + apiRoute);
 

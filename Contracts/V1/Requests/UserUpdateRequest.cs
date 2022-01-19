@@ -5,5 +5,5 @@ public record UserUpdateRequest
     /// <summary>
     /// expecting utc-time in iso 8601 format
     /// </summary>
-    public string DOB { get; set; }
+    public string DOB { get; set; } = string.Empty;
 }

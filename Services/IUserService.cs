@@ -5,12 +5,12 @@ namespace hello_asp_identity.Services;
 
 public interface IUserService
 {
-    Task<GetAllAsyncServiceResponse<AppUser>> GetUsersAsync(
-        GetAllUsersFilter filter = null,
-        PaginationFilter paginationFilter = null
+    Task<GetAllServiceResponse<AppUser>> GetUsersAsync(
+        GetAllUsersFilter filter,
+        PaginationFilter paginationFilter
     );
 
-    Task<AppUser> GetUserByIdAsync(int userId);
+    Task<AppUser?> GetUserByIdAsync(int userId);
 
     Task<bool> UpdateUserAsync(AppUser userToUpdate);
 
