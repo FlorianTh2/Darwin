@@ -2,8 +2,8 @@ namespace hello_asp_identity.Contracts.V1.Requests;
 
 public record PaginationQuery
 {
-    public int PageSize { get; set; }
-    public int PageNumber { get; set; }
+    public int PageSize { get; init; }
+    public int PageNumber { get; init; }
 
     public PaginationQuery()
     {

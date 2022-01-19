@@ -1,3 +1,7 @@
+using hello_asp_identity.Contracts.HealthChecks;
+using hello_asp_identity.Extensions;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+
 namespace hello_asp_identity.Installers;
 
 public static class RequestPipelineInstaller
@@ -12,7 +16,7 @@ public static class RequestPipelineInstaller
                 a.SwaggerEndpoint("v1/swagger.json", "hello-asp-identity (V1)");
             });
         }
-        app.UseHealthChecks("/health");
+        app.UseHealthChecks("/health", new HealthCheckOptions().SpecifyCustomResponseWriter());
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseAuthentication();

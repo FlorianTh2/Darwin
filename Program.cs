@@ -1,6 +1,7 @@
 using hello_asp_identity.Domain;
 using hello_asp_identity.Installers;
 using hello_asp_identity.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
