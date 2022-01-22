@@ -103,7 +103,7 @@ public class IdentityService : IIdentityService
 
         var confirmationLink = _uriService.GetBaseUri()
                                + ApiRoutes.Identity.RegisterConfirm
-                               + "?code="
+                               + "?token="
                                + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
 
         return new AuthenticationResult

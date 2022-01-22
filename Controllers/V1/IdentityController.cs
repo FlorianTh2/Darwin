@@ -5,6 +5,7 @@ using hello_asp_identity.Contracts.V1.Responses;
 using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
 using hello_asp_identity.Entities;
+using hello_asp_identity.Extensions;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -50,7 +51,22 @@ public class IdentityController : ControllerBase
     {
         Log.Information("Hit register-endpoint {@request}", request);
 
-        var serviceResponse = _identityService.RegisterAsync();
+        var serviceResponse = await _identityService.RegisterAsync(
+            request.UserName,
+            request.Email,
+            request.Password,
+            request.DOB.FromIso8601StringToDateTime()
+        );
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
 
         return Ok(new Response<RegisterResponse>(new RegisterResponse { Description = "Started registration" }));
     }
