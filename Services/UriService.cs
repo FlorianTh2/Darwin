@@ -13,6 +13,10 @@ public class UriService : IUriService
     {
         _baseUri = baseUri;
     }
+    public Uri GetBaseUri()
+    {
+        return new Uri(_baseUri);
+    }
 
     public Uri GetUri(string apiRoute, string id)
     {

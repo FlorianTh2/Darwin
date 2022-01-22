@@ -1,6 +1,7 @@
 using hello_asp_identity.Data;
 using hello_asp_identity.Entities;
 using hello_asp_identity.Options;
+using hello_asp_identity.Provider;
 using Microsoft.AspNetCore.Identity;
 
 namespace hello_asp_identity.Installers;
@@ -11,13 +12,18 @@ public static class IdentityInstaller
     {
         var accountSecruityOptions = config.GetSection(AccountSecruityOptions.SectionName).Get<AccountSecruityOptions>();
 
+        var emailProviderName = "ActiveEmailConfirmationProvider";
+        var passwordResetTokenProviderName = "AppResetPasswordTokenProvider";
+
         services.AddIdentityCore<AppUser>()
             .AddRoles<AppRole>()
             .AddRoleManager<RoleManager<AppRole>>()
             .AddSignInManager<SignInManager<AppUser>>()
             .AddRoleValidator<RoleValidator<AppRole>>()
             .AddEntityFrameworkStores<AppDbContext>()
-            .AddDefaultTokenProviders();
+            // .AddDefaultTokenProviders()
+            .AddTokenProvider<AppEmailConfirmationTokenProvider<AppUser>>(emailProviderName)
+            .AddTokenProvider<AppResetPasswordTokenProvider<AppUser>>(passwordResetTokenProviderName);
 
         services.Configure<IdentityOptions>(a =>
         {
@@ -26,6 +32,9 @@ public static class IdentityInstaller
             a.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
             a.Lockout.AllowedForNewUsers = true;
             a.Lockout.MaxFailedAccessAttempts = 5;
+            a.SignIn.RequireConfirmedEmail = true;
+            a.Tokens.EmailConfirmationTokenProvider = emailProviderName;
+            a.Tokens.PasswordResetTokenProvider = passwordResetTokenProviderName;
         });
 
         // services.AddAuthorization(options =>

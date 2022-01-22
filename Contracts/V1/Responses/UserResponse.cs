@@ -1,7 +1,7 @@
 namespace hello_asp_identity.Contracts.V1.Responses;
 
 public record UserResponse(
-    Guid Id,
+    int Id,
     string Username,
     string Email,
     int Age,

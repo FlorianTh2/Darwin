@@ -5,10 +5,9 @@ namespace hello_asp_identity.Entities;
 
 public class AppRole : IdentityRole<int>, IEntity<int>
 {
-    public AppRole() : base()
-    {
+    public AppRole() : base() { }
 
-    }
+    public AppRole(string roleName) : base(roleName) { }
 
     public string Comment { get; set; } = string.Empty;
 

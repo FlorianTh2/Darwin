@@ -3,6 +3,7 @@ using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Contracts.V1.Responses;
 using hello_asp_identity.Data;
+using hello_asp_identity.Domain;
 using hello_asp_identity.Entities;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -22,30 +23,35 @@ public class IdentityController : ControllerBase
     private readonly AppDbContext _dbContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
-
+    private readonly IUserService _userService;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IIdentityService _identityService;
     private readonly Serilog.ILogger _log = Log.ForContext<IdentityController>();
 
     public IdentityController(
         IHttpContextAccessor httpContextAccessor,
         IMapper mapper,
         IUriService uriService,
-        UserManager<AppUser> userManager,
-        SignInManager<AppUser> signInManager,
-        AppDbContext dbContext
+        IUserService userService,
+        ICurrentUserService currentUserService,
+        IIdentityService identityService
         )
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
-        _dbContext = dbContext;
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
+        _userService = userService;
+        _currentUserService = currentUserService;
+        _identityService = identityService;
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.Register, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<RegisterResponse>>> Register([FromBody] IdentityRegisterRequest request)
     {
-        Log.Information("Processed {@request}", request);
+        Log.Information("Hit register-endpoint {@request}", request);
+
+        var serviceResponse = _identityService.RegisterAsync();
+
         return Ok(new Response<RegisterResponse>(new RegisterResponse { Description = "Started registration" }));
     }
 
@@ -85,7 +91,7 @@ public class IdentityController : ControllerBase
     }
 
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> PasswordUpdate([FromRoute] Guid userId, [FromBody] IdentityPasswordUpdateRequest request)
+    public async Task<ActionResult<Response>> PasswordUpdate([FromRoute] int userId, [FromBody] IdentityPasswordUpdateRequest request)
     {
         // to identitfy user: extract userId from Token
 
@@ -104,7 +110,7 @@ public class IdentityController : ControllerBase
     }
 
     [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> EmailUpdate([FromRoute] Guid userId, [FromBody] IdentityEmailUpdateRequest request)
+    public async Task<ActionResult<Response>> EmailUpdate([FromRoute] int userId, [FromBody] IdentityEmailUpdateRequest request)
     {
         return Ok();
     }
@@ -114,6 +120,28 @@ public class IdentityController : ControllerBase
     {
         // SendEmailConfirmationWarningAsync
         return Ok();
+    }
+
+    [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]
+    public async Task<IActionResult> Delete([FromRoute] int userId)
+    {
+        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
+
+        if (!userOwnsUser)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>(
+                new List<ErrorModel>() {
+                    new ErrorModel() { Message = "You can not change user data of another user" }
+                }
+            ));
+        }
+
+        var deleted = await _identityService.DeleteUserByIdAsync(userId);
+
+        if (deleted)
+            return NoContent(); // 204
+
+        return NotFound();
     }
 
     // private async Task<string> SendEmailConfirmationWarningAsync(string userID, string subject)

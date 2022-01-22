@@ -63,18 +63,6 @@ public class UserService : IUserService
         return updated > 0;
     }
 
-    public async Task<bool> DeleteUserByIdAsync(int userId)
-    {
-        var user = await GetUserByIdAsync(userId);
-
-        if (user == null)
-            return false;
-
-        _dbContext.Users.Remove(user);
-        var deleted = await _dbContext.SaveChangesAsync();
-        return deleted > 0;
-    }
-
     private IQueryable<AppUser> AddFiltersOnQuery(
         GetAllUsersFilter filter,
         IQueryable<AppUser> queryable

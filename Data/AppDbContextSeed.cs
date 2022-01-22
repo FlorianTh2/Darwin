@@ -1,6 +1,9 @@
+using hello_asp_identity.Domain;
+using hello_asp_identity.Domain.Enums;
 using hello_asp_identity.Entities;
 using hello_asp_identity.Options;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace hello_asp_identity.Data;
 
@@ -18,13 +21,18 @@ public static class AppDbContextSeed
     public static async Task SeedDefaultUserAsync(UserManager<AppUser> userManager,
     RoleManager<AppRole> roleManager, AdminOptions adminOptions)
     {
-        var administratorRole = new AppRole();
-        administratorRole.Name = adminOptions.AdminRoleName;
+        var rolesToStore = Enum.GetValues(typeof(Roles)).OfType<Roles>().ToList();
 
-        if (roleManager.Roles.All(r => r.Name != administratorRole.Name))
+        var storedRoles = await roleManager.Roles.ToListAsync();
+
+        rolesToStore.Select(async a =>
         {
-            await roleManager.CreateAsync(administratorRole);
-        }
+            var roleName = a.ToString();
+            if (storedRoles.All(r => r.Name != roleName))
+            {
+                await roleManager.CreateAsync(new AppRole(roleName));
+            }
+        });
 
         var administrator = new AppUser()
         {
@@ -36,7 +44,7 @@ public static class AppDbContextSeed
         if (userManager.Users.All(u => u.Email != administrator.Email))
         {
             await userManager.CreateAsync(administrator, adminOptions.Password);
-            await userManager.AddToRolesAsync(administrator, new[] { administratorRole.Name });
+            await userManager.AddToRolesAsync(administrator, rolesToStore.Select((Roles a) => a.ToString()));
         }
     }
 }

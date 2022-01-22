@@ -5,8 +5,13 @@ namespace hello_asp_identity.Entities;
 public class AppUser : IdentityUser<int>, IEntity<int>
 {
     public DateTime DOB { get; set; }
-    public string? ConfirmedCode { get; set; }
+    public string? EmailConfirmationToken { get; set; }
+    public DateTime? EmailConfirmationTokenValidTo { get; set; }
+    public string? ResetPasswordToken { get; set; }
+    public DateTime? ResetPasswordTokenValidTo { get; set; }
     public bool Suspended { get; set; }
+
+    // used to store new email when user wants to transition to new email
     public string? UnConfirmedEmail { get; set; }
 
     public DateTime CreatedOn { get; set; }

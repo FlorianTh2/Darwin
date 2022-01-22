@@ -22,6 +22,8 @@ public class TestController : ControllerBase
     private readonly Serilog.ILogger _log = Log.ForContext<IdentityController>();
 
     // https://github.com/aau-giraf/web-api/blob/develop/GirafRest/Controllers/AccountController.cs
+    // https://github.com/Leftyx/AspNetIdentityCustomDb
+    // https://github.com/iammukeshm/CustomUserManagement.MVC
     public TestController(
         IHttpContextAccessor httpContextAccessor,
         IMapper mapper,

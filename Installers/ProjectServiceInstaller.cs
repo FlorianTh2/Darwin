@@ -14,6 +14,7 @@ public static class ProjectServiceInstaller
             var absoluteUri = string.Concat(request?.Scheme, "://", request?.Host.ToUriComponent(), "/");
             return new UriService(absoluteUri);
         });
+
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IDateTimeService, DateTimeService>();

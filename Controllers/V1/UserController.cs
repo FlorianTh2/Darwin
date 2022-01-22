@@ -39,8 +39,8 @@ public class UserController : ControllerBase
 
     [HttpGet(ApiRoutes.User.GetAll, Name = "[controller]_[action]")]
     public async Task<IActionResult> GetAll(
-        [FromQuery] GetAllUsersQuery query,
-        [FromQuery] PaginationQuery paginationQuery
+        [FromQuery] PaginationQuery paginationQuery,
+        [FromQuery] GetAllUsersQuery query
     )
     {
         var paginationFilter = _mapper.Map<PaginationFilter>(paginationQuery);
@@ -54,9 +54,15 @@ public class UserController : ControllerBase
     }
 
     [HttpGet(ApiRoutes.User.Get, Name = "[controller]_[action]")]
-    public async Task<IActionResult> Get([FromRoute] Guid userId)
+    public async Task<IActionResult> Get([FromRoute] int userId)
     {
-        return Ok();
+
+        var user = await _userService.GetUserByIdAsync(userId);
+
+        if (user == null)
+            return NotFound();
+
+        return Ok(new Response<UserResponse>(_mapper.Map<UserResponse>(user)));
     }
 
     [HttpPut(ApiRoutes.User.Update, Name = "[controller]_[action]")]
@@ -72,37 +78,15 @@ public class UserController : ControllerBase
                 }
             ));
         }
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = (await _userService.GetUserByIdAsync(userId))!;
 
         // following properties can be updated currently:
-        user!.DOB = request.DOB.FromIso8601StringToDateTime();
+        user.DOB = request.DOB.FromIso8601StringToDateTime();
 
         var updated = await _userService.UpdateUserAsync(user);
 
         if (updated)
             return Ok(new Response<UserResponse>(_mapper.Map<UserResponse>(user)));
-
-        return NotFound();
-    }
-
-    [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]
-    public async Task<IActionResult> Delete([FromRoute] int userId)
-    {
-        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
-
-        if (!userOwnsUser)
-        {
-            return BadRequest(new ErrorResponse<ErrorModel>(
-                new List<ErrorModel>() {
-                    new ErrorModel() { Message = "You can not change user data of another user" }
-                }
-            ));
-        }
-
-        var deleted = await _userService.DeleteUserByIdAsync(userId);
-
-        if (deleted)
-            return NoContent(); // 204
 
         return NotFound();
     }

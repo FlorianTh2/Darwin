@@ -15,6 +15,4 @@ public class AdminOptions
     public string Email { get; set; } = null!;
 
     public string Password { get; set; } = null!;
-
-    public string AdminRoleName { get; set; } = null!;
 }

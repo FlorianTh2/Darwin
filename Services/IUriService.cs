@@ -4,6 +4,8 @@ namespace hello_asp_identity.Services;
 
 public interface IUriService
 {
+    Uri GetBaseUri();
+
     Uri GetUri(string apiRoute, string id);
 
     Uri GetAllUri(string apiRoute, PaginationQuery? pagination = null);

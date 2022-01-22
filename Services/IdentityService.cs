@@ -1,10 +1,14 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
+using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
+using hello_asp_identity.Domain.Enums;
 using hello_asp_identity.Entities;
 using hello_asp_identity.Options;
+using hello_asp_identity.Provider;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -15,35 +19,97 @@ namespace hello_asp_identity.Services;
 
 public class IdentityService : IIdentityService
 {
+    private readonly IUserService _userService;
     private readonly UserManager<AppUser> _userManager;
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly RoleManager<AppRole> _roleManager;
     private readonly AppDbContext _dbContext;
     private readonly JwtOptions _jwtOptions;
     private readonly IDateTimeService _dateTimeService;
+    private readonly IUriService _uriService;
+    private readonly AppResetPasswordTokenProviderOptions _resetPasswordTokenProviderOptions;
+    private readonly AppEmailConfirmationTokenProviderOptions _emailProviderOptions;
 
-    // private readonly Serilog.ILogger _log = Log.ForContext<IdentityService>();
+    private readonly Serilog.ILogger _log = Log.ForContext<IdentityService>();
 
     public IdentityService(
+        IUserService userService,
         UserManager<AppUser> userManager,
         TokenValidationParameters tokenValidationParameters,
         RoleManager<AppRole> roleManager,
         AppDbContext dbContext,
         IOptions<JwtOptions> jwtOptions,
-        IDateTimeService dateTimeService
+        IDateTimeService dateTimeService,
+        IOptions<AppEmailConfirmationTokenProviderOptions> emailProviderOptions,
+        IOptions<AppResetPasswordTokenProviderOptions> resetPasswordTokenProviderOptions,
+        IUriService uriService
     )
     {
+        _userService = userService;
         _userManager = userManager;
         _tokenValidationParameters = tokenValidationParameters;
         _roleManager = roleManager;
         _dbContext = dbContext;
         _jwtOptions = jwtOptions.Value;
         _dateTimeService = dateTimeService;
+        _uriService = uriService;
+        _resetPasswordTokenProviderOptions = resetPasswordTokenProviderOptions.Value;
+        _emailProviderOptions = emailProviderOptions.Value;
     }
 
-    public Task<AuthenticationResult> RegisterAsync(string username, string email, string password)
+    public async Task<AuthenticationResult> RegisterAsync(string username, string email, string password, DateTime dob)
     {
-        throw new NotImplementedException();
+        var userInSystem0 = await _userManager.FindByEmailAsync(email.ToLower());
+
+        var userInSystem = await _dbContext
+            .Users
+            .FirstOrDefaultAsync(a => a.UserName == username || a.Email == email);
+
+        if (userInSystem != null)
+        {
+            return new AuthenticationResult
+            {
+                Success = false,
+                Errors = new[] { "User with this email address already exists" }
+            };
+        }
+
+        var user = new AppUser()
+        {
+            UserName = username,
+            Email = email,
+            DOB = dob
+        };
+
+        var identityResult_userCreation = await _userManager.CreateAsync(user, password);
+
+        if (!identityResult_userCreation.Succeeded)
+        {
+            return new AuthenticationResult
+            {
+                Errors = identityResult_userCreation.Errors.Select(a => a.Description)
+            };
+        }
+
+        _log.Information("User created a new account with password.");
+        await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        user.EmailConfirmationToken = token;
+        user.EmailConfirmationTokenValidTo = _dateTimeService.Now.Add(_emailProviderOptions.TokenLifespan);
+        user.EmailConfirmed = false;
+        var identityResult_updateEmail = await _userManager.UpdateAsync(user);
+
+        var confirmationLink = _uriService.GetBaseUri()
+                               + ApiRoutes.Identity.RegisterConfirm
+                               + "?code="
+                               + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
+
+        return new AuthenticationResult
+        {
+            Success = true,
+        };
     }
 
     public Task<AuthenticationResult> LoginAsync(string username, string password)
@@ -133,17 +199,23 @@ public class IdentityService : IIdentityService
             RefreshToken = refreshToken.Token
         };
     }
-    public async Task<string> GetUserNameAsync(int userId)
-    {
-        var user = await _userManager.Users.FirstAsync(u => u.Id == userId);
-
-        return user.UserName;
-    }
 
     public async Task<bool> IsInRoleAsync(int userId, string role)
     {
         var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
 
         return user != null && await _userManager.IsInRoleAsync(user, role);
+    }
+
+    public async Task<bool> DeleteUserByIdAsync(int userId)
+    {
+        var user = await _userService.GetUserByIdAsync(userId);
+
+        if (user == null)
+            return false;
+
+        _dbContext.Users.Remove(user);
+        var deleted = await _dbContext.SaveChangesAsync();
+        return deleted > 0;
     }
 }
