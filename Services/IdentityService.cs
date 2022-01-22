@@ -23,6 +23,8 @@ public class IdentityService : IIdentityService
     private readonly UserManager<AppUser> _userManager;
     private readonly TokenValidationParameters _tokenValidationParameters;
     private readonly RoleManager<AppRole> _roleManager;
+    private readonly SignInManager<AppUser> _signInManager;
+
     private readonly AppDbContext _dbContext;
     private readonly JwtOptions _jwtOptions;
     private readonly IDateTimeService _dateTimeService;
@@ -37,6 +39,7 @@ public class IdentityService : IIdentityService
         UserManager<AppUser> userManager,
         TokenValidationParameters tokenValidationParameters,
         RoleManager<AppRole> roleManager,
+        SignInManager<AppUser> signInManager,
         AppDbContext dbContext,
         IOptions<JwtOptions> jwtOptions,
         IDateTimeService dateTimeService,
@@ -47,6 +50,7 @@ public class IdentityService : IIdentityService
     {
         _userService = userService;
         _userManager = userManager;
+        _signInManager = signInManager;
         _tokenValidationParameters = tokenValidationParameters;
         _roleManager = roleManager;
         _dbContext = dbContext;
@@ -87,6 +91,7 @@ public class IdentityService : IIdentityService
         {
             return new AuthenticationResult
             {
+                Success = false,
                 Errors = identityResult_userCreation.Errors.Select(a => a.Description)
             };
         }
@@ -103,7 +108,9 @@ public class IdentityService : IIdentityService
 
         var confirmationLink = _uriService.GetBaseUri()
                                + ApiRoutes.Identity.RegisterConfirm
-                               + "?token="
+                               + "?UserId="
+                               + user.Id
+                               + "&Token="
                                + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
 
         return new AuthenticationResult
@@ -112,14 +119,159 @@ public class IdentityService : IIdentityService
         };
     }
 
-    public Task<AuthenticationResult> LoginAsync(string username, string password)
+    public async Task<AuthenticationResult> RegisterConfirmAsync(int userId, string token)
     {
-        throw new NotImplementedException();
+        var user = await _userService.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "User not found." } };
+        }
+        if (user.EmailConfirmed)
+        {
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "Users email already confirmed." } };
+        }
+        if (user.EmailConfirmationToken == null || user.EmailConfirmationToken != token)
+        {
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "EmailConfirmationToken not valid." } };
+        }
+        if (user.EmailConfirmationTokenValidTo < _dateTimeService.Now)
+        {
+            user.EmailConfirmationToken = null;
+            user.EmailConfirmationTokenValidTo = null;
+            await _userManager.UpdateAsync(user);
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "EmailConfirmationToken expired." } };
+        }
+        var identityResult_confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
+        if (!identityResult_confirmEmail.Succeeded)
+        {
+            user.EmailConfirmationToken = null;
+            user.EmailConfirmationTokenValidTo = null;
+            await _userManager.UpdateAsync(user);
+            return new AuthenticationResult() { Success = false, Errors = identityResult_confirmEmail.Errors.Select(a => a.Description) };
+        }
+
+        user.EmailConfirmationToken = null;
+        user.EmailConfirmationTokenValidTo = null;
+        await _userManager.UpdateAsync(user);
+
+        return await CreateToken(user);
     }
 
-    public Task<AuthenticationResult> RefreshTokenAsync(string token, string refreshToken)
+    public async Task<AuthenticationResult> LoginAsync(string username, string password)
     {
-        throw new NotImplementedException();
+
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == username);
+
+        if (user == null)
+        {
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "Check your credentials." } };
+        }
+        var signInResult = await _signInManager.CheckPasswordSignInAsync(user, password, true);
+        if (signInResult.IsLockedOut)
+        {
+            // https://stackoverflow.com/a/66043460/11244995
+            // https://stackoverflow.com/questions/22652118/disable-user-in-aspnet-identity-2-0
+            // UserManager.IsLockedOutAsync(user.Id)
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "User is locked." } };
+        }
+
+        if (!signInResult.Succeeded)
+        {
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "SignIn: unknown error." } };
+        }
+
+        return await CreateToken(user);
+    }
+
+    public async Task<AuthenticationResult> RefreshTokenAsync(string accesstoken, string refreshToken)
+    {
+        var claimsPrincipal = GetPrincipalFromToken(accesstoken);
+        if (claimsPrincipal == null)
+        {
+            return new AuthenticationResult { Success = false, Errors = new[] { "JWT not valid." } };
+        }
+
+        var expiryDateUnix = long.Parse(claimsPrincipal.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
+
+        var expiryDateTimeUtc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(expiryDateUnix);
+
+        if (expiryDateTimeUtc > _dateTimeService.Now)
+        {
+            return new AuthenticationResult { Errors = new[] { "Der JWT ist noch nicht abgelaufen." } };
+        }
+
+        var jti = claimsPrincipal.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+
+        // returns the stored refreshtoken for this jwt from the database
+        var storedRefreshToken = await _dbContext.RefreshTokens.FirstOrDefaultAsync(x => x.Token == refreshToken);
+
+        if (storedRefreshToken == null)
+        {
+            return new AuthenticationResult { Errors = new[] { "Refreshtoken not existing." } };
+        }
+
+        if (_dateTimeService.Now > storedRefreshToken.ExpirationDate)
+        {
+            return new AuthenticationResult { Errors = new[] { "Refreshtoken expired." } };
+        }
+
+        if (storedRefreshToken.Invalidated)
+        {
+            return new AuthenticationResult { Errors = new[] { "Refreshtoken invalidated." } };
+        }
+
+        if (storedRefreshToken.Used)
+        {
+            return new AuthenticationResult { Errors = new[] { "Refreshtoken already used." } };
+        }
+
+        if (storedRefreshToken.JwtId != jti)
+        {
+            return new AuthenticationResult { Errors = new[] { "Refreshtoken is referencing another JWT" } };
+        }
+
+        storedRefreshToken.Used = true;
+        _dbContext.RefreshTokens.Update(storedRefreshToken);
+        await _dbContext.SaveChangesAsync();
+
+        var user = await _userService.GetUserByIdAsync(Int32.Parse(claimsPrincipal.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value));
+        if (user == null)
+        {
+            return new AuthenticationResult { Errors = new[] { "User of expired JWT does not exist anymore." } };
+        }
+
+        return await CreateToken(user);
+    }
+
+    private ClaimsPrincipal? GetPrincipalFromToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+
+        try
+        {
+            var tokenValidationParameters = _tokenValidationParameters.Clone();
+            // set validate lifetime false since otherwise expired token will never be validated positivly
+            tokenValidationParameters.ValidateLifetime = false;
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var validatedToken);
+
+            // check for proper secruity-algorithm since in a jwt, you can specify secruityAlgorithm: none
+            if (!IsJwtWithValidSecrurityAlgorithm(validatedToken))
+            {
+                return null;
+            }
+            return principal;
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    private bool IsJwtWithValidSecrurityAlgorithm(SecurityToken validatedToken)
+    {
+        return (validatedToken is JwtSecurityToken jwtSecurityToken) &&
+               jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha512,
+                   StringComparison.InvariantCultureIgnoreCase);
     }
 
     private async Task<AuthenticationResult> CreateToken(AppUser appUser)

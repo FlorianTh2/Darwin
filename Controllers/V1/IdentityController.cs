@@ -68,13 +68,14 @@ public class IdentityController : ControllerBase
             });
         }
 
-        return Ok(new Response<RegisterResponse>(new RegisterResponse { Description = "Started registration" }));
+        return Ok(new Response<RegisterResponse>(new RegisterResponse { Description = "Started registration, email send." }));
     }
 
     [AllowAnonymous]
     [HttpGet(ApiRoutes.Identity.RegisterConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> RegisterConfirm([FromQuery] IdentityRegisterConfirmRequest request)
     {
+        var serviceResponse = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
         return Ok();
     }
 

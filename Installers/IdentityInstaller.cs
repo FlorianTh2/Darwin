@@ -33,6 +33,8 @@ public static class IdentityInstaller
             a.Lockout.AllowedForNewUsers = true;
             a.Lockout.MaxFailedAccessAttempts = 5;
             a.SignIn.RequireConfirmedEmail = true;
+            a.SignIn.RequireConfirmedAccount = false;
+            a.SignIn.RequireConfirmedPhoneNumber = false;
             a.Tokens.EmailConfirmationTokenProvider = emailProviderName;
             a.Tokens.PasswordResetTokenProvider = passwordResetTokenProviderName;
         });
