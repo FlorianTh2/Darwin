@@ -75,10 +75,6 @@ public class IdentityController : ControllerBase
     [HttpGet(ApiRoutes.Identity.RegisterConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> RegisterConfirm([FromQuery] IdentityRegisterConfirmRequest request)
     {
-        var user = await _userService.GetUserByIdAsync(request.UserId);
-        if (user == null)
-            return NotFound();
-
         var serviceResponse = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
         if (!serviceResponse.Success)
         {
@@ -149,14 +145,43 @@ public class IdentityController : ControllerBase
     [HttpPost(ApiRoutes.Identity.PasswordReset, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<PasswordResetResponse>>> PasswordReset([FromBody] IdentityPasswordResetRequest request)
     {
-        return Ok();
+        var serviceResponse = await _identityService.PasswordResetAsync(request.Email);
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
+        return Ok(new Response<PasswordResetResponse>(new PasswordResetResponse { Description = "Started reset password, email sent." }));
     }
 
     [AllowAnonymous]
-    [HttpGet(ApiRoutes.Identity.PasswordResetConfirm, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<PasswordResetConfirmResponse>>> PasswordResetConfirm([FromQuery] IdentityPasswordResetConfirmRequest request)
+    [HttpPost(ApiRoutes.Identity.PasswordResetConfirm, Name = "[controller]_[action]")]
+    public async Task<ActionResult<Response<PasswordResetConfirmResponse>>> PasswordResetConfirm([FromBody] IdentityPasswordResetConfirmRequest request)
     {
-        return Ok();
+
+        var serviceResponse = await _identityService.PasswordResetConfirmAsync(
+            request.UserId,
+            request.PasswordResetConfirmationToken,
+            request.password
+        );
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
+        return Ok(new Response<PasswordResetConfirmResponse>(new PasswordResetConfirmResponse { Description = "Password resetted, please login." }));
     }
 
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
@@ -208,7 +233,7 @@ public class IdentityController : ControllerBase
 
         var deleted = await _identityService.DeleteUserByIdAsync(userId);
 
-        if (deleted)
+        if (deleted.Success)
             return NoContent(); // 204
 
         return NotFound();

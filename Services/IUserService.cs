@@ -5,7 +5,7 @@ namespace hello_asp_identity.Services;
 
 public interface IUserService
 {
-    Task<GetAllServiceResponse<AppUser>> GetUsersAsync(
+    Task<GetAllServiceResult<AppUser>> GetUsersAsync(
         GetAllUsersFilter filter,
         PaginationFilter paginationFilter
     );

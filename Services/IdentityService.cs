@@ -6,6 +6,7 @@ using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
 using hello_asp_identity.Domain.Enums;
+using hello_asp_identity.Domain.Results;
 using hello_asp_identity.Entities;
 using hello_asp_identity.Options;
 using hello_asp_identity.Provider;
@@ -61,17 +62,15 @@ public class IdentityService : IIdentityService
         _emailProviderOptions = emailProviderOptions.Value;
     }
 
-    public async Task<AuthenticationResult> RegisterAsync(string username, string email, string password, DateTime dob)
+    public async Task<RegisterResult> RegisterAsync(string username, string email, string password, DateTime dob)
     {
-        var userInSystem0 = await _userManager.FindByEmailAsync(email.ToLower());
-
         var userInSystem = await _dbContext
             .Users
             .FirstOrDefaultAsync(a => a.UserName == username || a.Email == email);
 
         if (userInSystem != null)
         {
-            return new AuthenticationResult
+            return new RegisterResult
             {
                 Success = false,
                 Errors = new[] { "User with this email address already exists" }
@@ -89,7 +88,7 @@ public class IdentityService : IIdentityService
 
         if (!identityResult_userCreation.Succeeded)
         {
-            return new AuthenticationResult
+            return new RegisterResult
             {
                 Success = false,
                 Errors = identityResult_userCreation.Errors.Select(a => a.Description)
@@ -106,21 +105,28 @@ public class IdentityService : IIdentityService
         user.EmailConfirmed = false;
         var identityResult_updateEmail = await _userManager.UpdateAsync(user);
 
-        var confirmationLink = _uriService.GetBaseUri()
+        var callbackUrl = _uriService.GetBaseUri()
                                + ApiRoutes.Identity.RegisterConfirm
                                + "?UserId="
                                + user.Id
                                + "&Token="
                                + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
 
-        return new AuthenticationResult
+        return new RegisterResult
         {
             Success = true,
+            CallbackUrl = callbackUrl
         };
     }
 
     public async Task<AuthenticationResult> RegisterConfirmAsync(int userId, string token)
     {
+        var user = await _userService.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "User not found." } };
+        }
+
         if (user.EmailConfirmed)
         {
             return new AuthenticationResult() { Success = false, Errors = new string[] { "Users email already confirmed." } };
@@ -236,6 +242,122 @@ public class IdentityService : IIdentityService
         }
 
         return await CreateToken(user);
+    }
+
+    public async Task<PasswordResetResult> PasswordResetAsync(string email)
+    {
+        AppUser user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return new PasswordResetResult
+            {
+                Success = false,
+                Errors = new string[] { "User not found." }
+            };
+        }
+
+        var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        user.ResetPasswordToken = resetToken;
+        user.ResetPasswordTokenValidTo = _dateTimeService.Now.Add(_resetPasswordTokenProviderOptions.TokenLifespan);
+        var update_result = await _userManager.UpdateAsync(user);
+
+        if (!update_result.Succeeded)
+        {
+            return new PasswordResetResult
+            {
+                Success = false,
+                Errors = update_result.Errors.Select(a => a.Description)
+            };
+        }
+
+        var callbackUrl = _uriService.GetBaseUri()
+                               + ApiRoutes.Identity.PasswordReset
+                               + "?UserId="
+                               + user.Id
+                               + "&Token="
+                               + HttpUtility.UrlEncode(resetToken, System.Text.Encoding.UTF8);
+
+        return new PasswordResetResult()
+        {
+            Success = true,
+            CallbackUrl = callbackUrl
+        };
+    }
+    public async Task<Result> PasswordResetConfirmAsync(int userId, string token, string password)
+    {
+        var user = await _userService.GetUserByIdAsync(userId);
+
+        if (user == null)
+        {
+            return new Result { Success = false, Errors = new string[] { "User not found." } };
+        }
+        if (user.ResetPasswordToken == null)
+        {
+            return new Result { Success = false, Errors = new string[] { "Reset password token not found." } };
+        }
+        if (user.ResetPasswordTokenValidTo < _dateTimeService.Now)
+        {
+            user.ResetPasswordToken = null;
+            user.ResetPasswordTokenValidTo = null;
+            await _userManager.UpdateAsync(user);
+            return new Result { Success = false, Errors = new string[] { "Reset password token expired." } };
+        }
+
+        var identityResult_resetPassword = await _userManager.ResetPasswordAsync(user, token, password);
+
+        if (identityResult_resetPassword.Succeeded == false && user.ResetPasswordToken == token)
+        {
+            user.ResetPasswordToken = null;
+            user.ResetPasswordTokenValidTo = null;
+            await _userManager.UpdateAsync(user);
+            return new Result { Success = false, Errors = new string[] { "Unknown error." } };
+        }
+
+        return new Result()
+        {
+            Success = true
+        };
+    }
+
+    public async Task<Result> PasswordUpdateAsync(int userId, string password, string newPassword)
+    {
+        var user = await _userService.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return new Result { Success = false, Errors = new string[] { "User not found." } };
+        }
+        var identityResult_changePassword = await _userManager.ChangePasswordAsync(user, password, newPassword);
+        if (!identityResult_changePassword.Succeeded)
+        {
+            return new Result
+            {
+                Success = false,
+                Errors = identityResult_changePassword.Errors.Select(a => a.Description)
+            };
+        }
+
+
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+        return null;
+    }
+
+    public async Task<Result> UsernameUpdateAsync(int userId, string password, string newPassword)
+    {
+        return null;
+    }
+
+    public async Task<EmailResetResult> EmailUpdateAsync(int userId, string password, string newPassword)
+    {
+        return null;
+    }
+
+    public async Task<Result> EmailUpdateConfirmAsync(string password, string newPassword)
+    {
+        return null;
     }
 
     private ClaimsPrincipal? GetPrincipalFromToken(string token)
@@ -354,15 +476,15 @@ public class IdentityService : IIdentityService
         return user != null && await _userManager.IsInRoleAsync(user, role);
     }
 
-    public async Task<bool> DeleteUserByIdAsync(int userId)
+    public async Task<Result> DeleteUserByIdAsync(int userId)
     {
         var user = await _userService.GetUserByIdAsync(userId);
 
         if (user == null)
-            return false;
+            return new Result() { Success = false };
 
         _dbContext.Users.Remove(user);
         var deleted = await _dbContext.SaveChangesAsync();
-        return deleted > 0;
+        return new Result() { Success = deleted > 0 };
     }
 }

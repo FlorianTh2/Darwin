@@ -16,7 +16,7 @@ public class UserService : IUserService
         _dbContext = dbContext;
     }
 
-    public async Task<GetAllServiceResponse<AppUser>> GetUsersAsync(
+    public async Task<GetAllServiceResult<AppUser>> GetUsersAsync(
         GetAllUsersFilter filter,
         PaginationFilter paginationFilter
     )
@@ -31,7 +31,7 @@ public class UserService : IUserService
 
         var skip = (paginationFilter.PageNumber - 1) * paginationFilter.PageSize;
 
-        var serviceResponse = new GetAllServiceResponse<AppUser>()
+        var serviceResponse = new GetAllServiceResult<AppUser>()
         {
             TotalNumber = await queryable
                 .AsNoTracking()
