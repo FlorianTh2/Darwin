@@ -90,21 +90,59 @@ public class IdentityController : ControllerBase
                 }).ToList()
             });
         }
-        return Ok();
+        return Ok(new Response<AuthResponse>(new AuthResponse()
+        {
+            AccessToken = serviceResponse.AccessToken!,
+            RefreshToken = serviceResponse.RefreshToken!
+        }));
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.Login, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> Login([FromBody] IdentityLoginRequest request)
     {
-        return Ok();
+        var serviceResponse = await _identityService.LoginAsync(request.Username, request.Password);
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
+
+        return Ok(new Response<AuthResponse>(new AuthResponse
+        {
+            AccessToken = serviceResponse.AccessToken!,
+            RefreshToken = serviceResponse.RefreshToken!
+        }));
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.RefreshAccessToken, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> RefreshAccessToken([FromBody] IdentityRefreshAccessTokenRequest request)
     {
-        return Ok();
+        var serviceResponse = await _identityService.RefreshTokenAsync(request.AccessToken, request.RefreshToken);
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
+
+        return Ok(new Response<AuthResponse>(new AuthResponse
+        {
+            AccessToken = serviceResponse.AccessToken!,
+            RefreshToken = serviceResponse.RefreshToken!
+        }));
     }
 
     [AllowAnonymous]
@@ -163,7 +201,7 @@ public class IdentityController : ControllerBase
             return BadRequest(new ErrorResponse<ErrorModel>()
             {
                 Errors = new List<ErrorModel>() {
-                    new ErrorModel() { Message = "You can not change user data of another user" }
+                    new ErrorModel() { Message = "You can not delete another user." }
                 }
             });
         }

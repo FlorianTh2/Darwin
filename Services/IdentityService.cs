@@ -342,7 +342,7 @@ public class IdentityService : IIdentityService
         return new AuthenticationResult()
         {
             Success = true,
-            Token = tokenHandler.WriteToken(token),
+            AccessToken = tokenHandler.WriteToken(token),
             RefreshToken = refreshToken.Token
         };
     }

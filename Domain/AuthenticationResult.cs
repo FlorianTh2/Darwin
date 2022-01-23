@@ -2,7 +2,7 @@ namespace hello_asp_identity.Domain;
 
 public class AuthenticationResult
 {
-    public string? Token { get; set; }
+    public string? AccessToken { get; set; }
 
     public string? RefreshToken { get; set; }
 
