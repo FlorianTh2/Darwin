@@ -284,6 +284,41 @@ public class IdentityService : IIdentityService
             CallbackUrl = callbackUrl
         };
     }
+
+    public async Task<PasswordResetByAdminResult> PasswordResetByAdminAsync(string email)
+    {
+        AppUser user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return new PasswordResetByAdminResult
+            {
+                Success = false,
+                Errors = new string[] { "User not found." }
+            };
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        var newPassword = Password.Generate(16, 4);
+
+        var identityResult_resetPasswordByAdmin = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+        if (!identityResult_resetPasswordByAdmin.Succeeded)
+        {
+            return new PasswordResetByAdminResult { Success = false, Errors = new string[] { "Unknown error." } };
+        }
+
+        user.ResetPasswordToken = null;
+        user.ResetPasswordTokenValidTo = null;
+        await _userManager.UpdateAsync(user);
+
+        return new PasswordResetByAdminResult()
+        {
+            Success = true,
+            NewPassword = newPassword
+        };
+    }
+
     public async Task<Result> PasswordResetConfirmAsync(int userId, string token, string password)
     {
         var user = await _userService.GetUserByIdAsync(userId);
@@ -306,7 +341,7 @@ public class IdentityService : IIdentityService
 
         var identityResult_resetPassword = await _userManager.ResetPasswordAsync(user, token, password);
 
-        if (identityResult_resetPassword.Succeeded == false && user.ResetPasswordToken == token)
+        if (!identityResult_resetPassword.Succeeded && user.ResetPasswordToken == token)
         {
             user.ResetPasswordToken = null;
             user.ResetPasswordTokenValidTo = null;
@@ -337,12 +372,10 @@ public class IdentityService : IIdentityService
             };
         }
 
-
-
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-        var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
-        return null;
+        return new Result()
+        {
+            Success = true
+        };
     }
 
     public async Task<Result> UsernameUpdateAsync(int userId, string password, string newPassword)

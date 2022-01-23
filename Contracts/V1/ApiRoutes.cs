@@ -22,6 +22,7 @@ public static class ApiRoutes
         public const string Login = IdentityRessource + "/login";
         public const string RefreshAccessToken = IdentityRessource + "/refresh";
         public const string PasswordReset = IdentityRessource + "/password_reset";
+        public const string PasswordResetByAdmin = IdentityRessource + "/password_reset_by_admin";
         public const string PasswordResetConfirm = IdentityRessource + "/password_reset";
         public const string PasswordUpdate = IdentityRessource + "/password_update/{userId}";
         public const string UsernameUpdate = IdentityRessource + "/username_update/{userId}";

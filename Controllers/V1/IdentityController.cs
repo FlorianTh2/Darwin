@@ -1,9 +1,12 @@
 using AutoMapper;
+using hello_asp_identity.Attributes;
 using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Contracts.V1.Responses;
 using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
+using hello_asp_identity.Domain.Enums;
+using hello_asp_identity.Domain.Results;
 using hello_asp_identity.Entities;
 using hello_asp_identity.Extensions;
 using hello_asp_identity.Services;
@@ -160,11 +163,29 @@ public class IdentityController : ControllerBase
         return Ok(new Response<PasswordResetResponse>(new PasswordResetResponse { Description = "Started reset password, email sent." }));
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.SuperAdmin)]
+    [HttpPost(ApiRoutes.Identity.PasswordResetByAdmin, Name = "[controller]_[action]")]
+    public async Task<ActionResult<Response<PasswordResetByAdminResponse>>> PasswordResetByAdmin([FromBody] IdentityPasswordResetByAdminRequest request)
+    {
+        var serviceResponse = await _identityService.PasswordResetByAdminAsync(request.Email);
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
+        return Ok(new Response<PasswordResetByAdminResponse>(new PasswordResetByAdminResponse { NewPassword = serviceResponse.NewPassword! }));
+    }
+
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.PasswordResetConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<PasswordResetConfirmResponse>>> PasswordResetConfirm([FromBody] IdentityPasswordResetConfirmRequest request)
     {
-
         var serviceResponse = await _identityService.PasswordResetConfirmAsync(
             request.UserId,
             request.PasswordResetConfirmationToken,
@@ -194,7 +215,20 @@ public class IdentityController : ControllerBase
         // var token = await UserManager.GeneratePasswordResetTokenAsync(user);
 
         // var result = await UserManager.ResetPasswordAsync(user, token, "MyN3wP@ssw0rd");
-        return Ok();
+
+        var serviceResponse = await _identityService.PasswordUpdateAsync(userId, request.Password, request.NewPassword);
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
+        return Ok(new Response<PasswordUpdateResponse>(new PasswordUpdateResponse { Description = "Password updated successfully" }));
     }
 
     [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]

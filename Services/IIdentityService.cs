@@ -10,6 +10,10 @@ public interface IIdentityService
     Task<AuthenticationResult> LoginAsync(string username, string password);
     Task<AuthenticationResult> RefreshTokenAsync(string accessToken, string refreshToken);
     Task<PasswordResetResult> PasswordResetAsync(string email);
+
+    // maybe important in cases where user cant reset his password himself
+    // email of user who needs a password reset
+    Task<PasswordResetByAdminResult> PasswordResetByAdminAsync(string email);
     Task<Result> PasswordResetConfirmAsync(int userId, string token, string password);
     Task<Result> PasswordUpdateAsync(int userId, string password, string newPassword);
     Task<Result> UsernameUpdateAsync(int userId, string password, string newPassword);
