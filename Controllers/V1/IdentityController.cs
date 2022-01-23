@@ -17,10 +17,7 @@ using Serilog;
 
 namespace hello_asp_identity.Controllers.V1;
 
-[Authorize]
-[ApiController]
-[Produces("application/json")]
-public class IdentityController : ControllerBase
+public class IdentityController : AppControllerBase
 {
     private readonly UserManager<AppUser> _userManager;
     private readonly SignInManager<AppUser> _signInManager;

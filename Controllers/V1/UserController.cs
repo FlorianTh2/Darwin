@@ -14,7 +14,7 @@ namespace hello_asp_identity.Controllers.V1;
 [Authorize]
 [ApiController]
 [Produces("application/json")]
-public class UserController : ControllerBase
+public class UserController : AppControllerBase
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
