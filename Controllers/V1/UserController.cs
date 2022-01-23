@@ -38,7 +38,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet(ApiRoutes.User.GetAll, Name = "[controller]_[action]")]
-    public async Task<IActionResult> GetAll(
+    public async Task<ActionResult<PagedResponse<UserResponse>>> GetAll(
         [FromQuery] PaginationQuery paginationQuery,
         [FromQuery] GetAllUsersQuery query
     )
@@ -54,7 +54,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet(ApiRoutes.User.Get, Name = "[controller]_[action]")]
-    public async Task<IActionResult> Get([FromRoute] int userId)
+    public async Task<ActionResult<Response<UserResponse>>> Get([FromRoute] int userId)
     {
 
         var user = await _userService.GetUserByIdAsync(userId);
@@ -66,17 +66,21 @@ public class UserController : ControllerBase
     }
 
     [HttpPut(ApiRoutes.User.Update, Name = "[controller]_[action]")]
-    public async Task<IActionResult> Update([FromRoute] int userId, [FromBody] UserUpdateRequest request)
+    public async Task<ActionResult<Response<UserResponse>>> Update(
+        [FromRoute] int userId,
+        [FromBody] UserUpdateRequest request
+    )
     {
         var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>(
-                new List<ErrorModel>() {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = new List<ErrorModel>() {
                     new ErrorModel() { Message = "You can not change user data of another user" }
                 }
-            ));
+            });
         }
         var user = (await _userService.GetUserByIdAsync(userId))!;
 

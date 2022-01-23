@@ -49,10 +49,10 @@ public class IdentityController : ControllerBase
     [HttpPost(ApiRoutes.Identity.Register, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<RegisterResponse>>> Register([FromBody] IdentityRegisterRequest request)
     {
-        Log.Information("Hit register-endpoint {@request}", request);
+        Log.Information("Registration of: {@request}", request);
 
         var serviceResponse = await _identityService.RegisterAsync(
-            request.UserName,
+            request.Username,
             request.Email,
             request.Password,
             request.DOB.FromIso8601StringToDateTime()
@@ -75,7 +75,21 @@ public class IdentityController : ControllerBase
     [HttpGet(ApiRoutes.Identity.RegisterConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> RegisterConfirm([FromQuery] IdentityRegisterConfirmRequest request)
     {
+        var user = await _userService.GetUserByIdAsync(request.UserId);
+        if (user == null)
+            return NotFound();
+
         var serviceResponse = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
         return Ok();
     }
 
@@ -95,20 +109,20 @@ public class IdentityController : ControllerBase
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.PasswordReset, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> PasswordReset([FromBody] IdentityPasswordResetRequest request)
+    public async Task<ActionResult<Response<PasswordResetResponse>>> PasswordReset([FromBody] IdentityPasswordResetRequest request)
     {
         return Ok();
     }
 
     [AllowAnonymous]
     [HttpGet(ApiRoutes.Identity.PasswordResetConfirm, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> PasswordResetConfirm([FromQuery] IdentityPasswordResetConfirmRequest request)
+    public async Task<ActionResult<Response<PasswordResetConfirmResponse>>> PasswordResetConfirm([FromQuery] IdentityPasswordResetConfirmRequest request)
     {
         return Ok();
     }
 
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> PasswordUpdate([FromRoute] int userId, [FromBody] IdentityPasswordUpdateRequest request)
+    public async Task<ActionResult<Response<PasswordUpdateResponse>>> PasswordUpdate([FromRoute] int userId, [FromBody] IdentityPasswordUpdateRequest request)
     {
         // to identitfy user: extract userId from Token
 
@@ -121,19 +135,19 @@ public class IdentityController : ControllerBase
     }
 
     [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> UsernameUpdate([FromRoute] Guid userId, [FromBody] IdentityUsernameUpdateRequest request)
+    public async Task<ActionResult<Response<UsernameUpdateResponse>>> UsernameUpdate([FromRoute] Guid userId, [FromBody] IdentityUsernameUpdateRequest request)
     {
         return Ok();
     }
 
     [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> EmailUpdate([FromRoute] int userId, [FromBody] IdentityEmailUpdateRequest request)
+    public async Task<ActionResult<Response<EmailUpdateResponse>>> EmailUpdate([FromRoute] int userId, [FromBody] IdentityEmailUpdateRequest request)
     {
         return Ok();
     }
 
     [HttpGet(ApiRoutes.Identity.EmailUpdateConfirm, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response>> EmailUpdateConfirm([FromQuery] IdentityEmailUpdateConfirmRequest request)
+    public async Task<ActionResult<Response<EmailUpdateConfirmResponse>>> EmailUpdateConfirm([FromQuery] IdentityEmailUpdateConfirmRequest request)
     {
         // SendEmailConfirmationWarningAsync
         return Ok();
@@ -146,11 +160,12 @@ public class IdentityController : ControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>(
-                new List<ErrorModel>() {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = new List<ErrorModel>() {
                     new ErrorModel() { Message = "You can not change user data of another user" }
                 }
-            ));
+            });
         }
 
         var deleted = await _identityService.DeleteUserByIdAsync(userId);
@@ -160,15 +175,4 @@ public class IdentityController : ControllerBase
 
         return NotFound();
     }
-
-    // private async Task<string> SendEmailConfirmationWarningAsync(string userID, string subject)
-    // {
-    //     string code = await UserManager.GenerateEmailConfirmationTokenAsync(userID);
-    //     var callbackUrl = Url.Action("ConfirmEmail", "Account",
-    //        new { userId = userID, code = code }, protocol: Request.Url.Scheme);
-    //     await UserManager.SendEmailAsync(userID, subject,
-    //        "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
-
-    //     return callbackUrl;
-    // }
 }

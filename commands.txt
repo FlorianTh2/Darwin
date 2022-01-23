@@ -34,3 +34,6 @@ docker-compose build
 docker-compose up
 https://0.0.0.0:5000/swagger/index.html
 docker-compose down
+
+weiter mit user erstellung
+	service methoden registerConfirmation, login, refreshtoken in controller einbinden

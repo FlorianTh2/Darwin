@@ -121,11 +121,6 @@ public class IdentityService : IIdentityService
 
     public async Task<AuthenticationResult> RegisterConfirmAsync(int userId, string token)
     {
-        var user = await _userService.GetUserByIdAsync(userId);
-        if (user == null)
-        {
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "User not found." } };
-        }
         if (user.EmailConfirmed)
         {
             return new AuthenticationResult() { Success = false, Errors = new string[] { "Users email already confirmed." } };
