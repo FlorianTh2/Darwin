@@ -283,36 +283,6 @@ public class IdentityService : IIdentityService
         };
     }
 
-    public async Task<Result<PasswordResetByAdminResult>> PasswordResetByAdminAsync(string email)
-    {
-        AppUser user = await _userManager.FindByEmailAsync(email);
-        if (user == null)
-        {
-            return new Result<PasswordResetByAdminResult> { Errors = new() { "User not found." } };
-        }
-
-        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-        var newPassword = Password.Generate(16, 4);
-
-        var identityResult_resetPasswordByAdmin = await _userManager.ResetPasswordAsync(user, token, newPassword);
-
-        if (!identityResult_resetPasswordByAdmin.Succeeded)
-        {
-            return new Result<PasswordResetByAdminResult> { Errors = new() { "Unknown error." } };
-        }
-
-        user.ResetPasswordToken = null;
-        user.ResetPasswordTokenValidTo = null;
-        await _userManager.UpdateAsync(user);
-
-        return new Result<PasswordResetByAdminResult>()
-        {
-            Success = true,
-            Data = new PasswordResetByAdminResult() { NewPassword = newPassword }
-        };
-    }
-
     public async Task<Result> PasswordResetConfirmAsync(int userId, string token, string password)
     {
         var user = (await _userService.GetUserByIdAsync(userId)).Data;
@@ -343,7 +313,41 @@ public class IdentityService : IIdentityService
             return new Result { Errors = new() { "Unknown error." } };
         }
 
+        await InvalidateRefreshtokensAsync(user.Id);
+
         return new Result() { Success = true };
+    }
+
+    public async Task<Result<PasswordResetByAdminResult>> PasswordResetByAdminAsync(string email)
+    {
+        AppUser user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            return new Result<PasswordResetByAdminResult> { Errors = new() { "User not found." } };
+        }
+
+        var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        var newPassword = Password.Generate(16, 4);
+
+        var identityResult_resetPasswordByAdmin = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+        if (!identityResult_resetPasswordByAdmin.Succeeded)
+        {
+            return new Result<PasswordResetByAdminResult> { Errors = new() { "Unknown error." } };
+        }
+
+        user.ResetPasswordToken = null;
+        user.ResetPasswordTokenValidTo = null;
+        await _userManager.UpdateAsync(user);
+
+        await InvalidateRefreshtokensAsync(user.Id);
+
+        return new Result<PasswordResetByAdminResult>()
+        {
+            Success = true,
+            Data = new PasswordResetByAdminResult() { NewPassword = newPassword }
+        };
     }
 
     public async Task<Result> PasswordUpdateAsync(int userId, string password, string newPassword)
@@ -359,6 +363,8 @@ public class IdentityService : IIdentityService
         {
             return new Result { Errors = identityResult_changePassword.Errors.Select(a => a.Description).ToList() };
         }
+
+        await InvalidateRefreshtokensAsync(user.Id);
 
         return new Result() { Success = true };
     }
@@ -376,6 +382,8 @@ public class IdentityService : IIdentityService
         {
             return new Result { Errors = identityResult_updateUser.Errors.Select(a => a.Description).ToList() };
         }
+
+        await InvalidateRefreshtokensAsync(user.Id);
 
         return new Result() { Success = true };
     }
@@ -472,6 +480,9 @@ public class IdentityService : IIdentityService
             await _userManager.UpdateAsync(user);
             return new Result() { Errors = identityResult_updateUser.Errors.Select(a => a.Description).ToList() };
         }
+
+        await InvalidateRefreshtokensAsync(user.Id);
+
         return new Result() { Success = true };
 
     }
@@ -608,5 +619,19 @@ public class IdentityService : IIdentityService
         _dbContext.Users.Remove(user);
         var deleted = await _dbContext.SaveChangesAsync();
         return new Result<bool>() { Success = true, Data = deleted > 0 };
+    }
+
+    public async Task<Result> InvalidateRefreshtokensAsync(int userId)
+    {
+        // currently only invalidating refreshToken so that
+        // currently valid jwt cannot be extended with its attached refreshToken
+        var refreshTokens = _dbContext.RefreshTokens.AsQueryable()
+            .Where(a => a.UserId == userId)
+            .ToList();
+
+        refreshTokens.ForEach(a => a.Invalidated = true);
+        await _dbContext.SaveChangesAsync();
+
+        return new Result() { Success = true };
     }
 }

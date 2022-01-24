@@ -21,4 +21,5 @@ public interface IIdentityService
     Task<Result> EmailUpdateConfirmAsync(int userId, string token);
     Task<Result<bool>> DeleteUserByIdAsync(int userId);
     Task<Result<bool>> IsInRoleAsync(int userId, string role);
+    Task<Result> InvalidateRefreshtokensAsync(int userId);
 }

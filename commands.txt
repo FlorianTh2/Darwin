@@ -41,8 +41,6 @@ kleinen mailservice bauen + integrieren in register, password reset, password up
 
 passwort/username/email/... reset -> invalidate refreshtoken
 
-callbackuri-creation in uriservice auslagern
-
 validation for several identityController
 
 

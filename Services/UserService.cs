@@ -77,7 +77,6 @@ public class UserService : IUserService
         _dbContext.Users.Update(userToUpdate);
         var updated = await _dbContext.SaveChangesAsync();
         return new Result<bool>() { Success = true, Data = updated > 0 };
-
     }
 
     private IQueryable<AppUser> AddFiltersOnQuery(
