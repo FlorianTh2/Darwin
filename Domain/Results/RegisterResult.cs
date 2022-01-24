@@ -2,5 +2,5 @@ namespace hello_asp_identity.Domain.Results;
 
 public class RegisterResult
 {
-    public string Description { get; set; } = string.Empty;
+    public string CallbackUrl { get; set; } = string.Empty;
 }

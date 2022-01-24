@@ -36,7 +36,6 @@ https://0.0.0.0:5000/swagger/index.html
 docker-compose down
 
 
-weiter mit basecontroller
 automapper einbauen
     description eventuell into service verlegen
 kleinen mailservice bauen + integrieren in register, password reset, password update, passwordResetByAdmin,email update confirm,...

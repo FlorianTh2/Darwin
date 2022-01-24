@@ -98,6 +98,8 @@ public class IdentityService : IIdentityService
         _log.Information("User created a new account with password.");
         await _userManager.AddToRoleAsync(user, Roles.Basic.ToString());
 
+        // var token = await _userManager.GenerateUserTokenAsync(user,
+        //     _resetPasswordTokenProviderOptions.Name, "ResetPasswordWithToken");
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
         user.EmailConfirmationToken = token;
@@ -115,13 +117,13 @@ public class IdentityService : IIdentityService
         return new Result<RegisterResult>()
         {
             Success = true,
-            Data = new RegisterResult() { Description = "Started registration, email sent." }
+            Data = new RegisterResult() { CallbackUrl = callbackUrl }
         };
     }
 
     public async Task<Result<AuthResult>> RegisterConfirmAsync(int userId, string token)
     {
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
         {
             return new Result<AuthResult>() { Errors = new() { "User not found." } };
@@ -235,7 +237,10 @@ public class IdentityService : IIdentityService
         _dbContext.RefreshTokens.Update(storedRefreshToken);
         await _dbContext.SaveChangesAsync();
 
-        var user = await _userService.GetUserByIdAsync(Int32.Parse(claimsPrincipal.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value));
+        var userServiceResponse = await _userService.GetUserByIdAsync(
+            Int32.Parse(claimsPrincipal.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value)
+        );
+        var user = userServiceResponse.Data;
         if (user == null)
         {
             return new Result<AuthResult> { Errors = new() { "User of expired JWT does not exist anymore." } };
@@ -309,7 +314,7 @@ public class IdentityService : IIdentityService
 
     public async Task<Result> PasswordResetConfirmAsync(int userId, string token, string password)
     {
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = (await _userService.GetUserByIdAsync(userId)).Data;
 
         if (user == null)
         {
@@ -342,7 +347,7 @@ public class IdentityService : IIdentityService
 
     public async Task<Result> PasswordUpdateAsync(int userId, string password, string newPassword)
     {
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
         {
             return new Result { Errors = new() { "User not found." } };
@@ -359,7 +364,7 @@ public class IdentityService : IIdentityService
 
     public async Task<Result> UsernameUpdateAsync(int userId, string newUsername)
     {
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
         {
             return new Result { Errors = new() { "User not found." } };
@@ -376,7 +381,7 @@ public class IdentityService : IIdentityService
 
     public async Task<Result<EmailResetResult>> EmailUpdateAsync(int userId, string oldEmail, string unConfirmedEmail)
     {
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
         {
             return new Result<EmailResetResult> { Errors = new() { "User not found." } };
@@ -419,7 +424,7 @@ public class IdentityService : IIdentityService
 
     public async Task<Result> EmailUpdateConfirmAsync(int userId, string token)
     {
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
         {
             return new Result() { Success = false, Errors = new() { "User not found." } };
@@ -590,10 +595,12 @@ public class IdentityService : IIdentityService
 
     public async Task<Result<bool>> DeleteUserByIdAsync(int userId)
     {
-        var user = await _userService.GetUserByIdAsync(userId);
+        var user = (await _userService.GetUserByIdAsync(userId)).Data;
 
         if (user == null)
+        {
             return new Result<bool>() { Errors = new() { "User not found." } };
+        }
 
         _dbContext.Users.Remove(user);
         var deleted = await _dbContext.SaveChangesAsync();
