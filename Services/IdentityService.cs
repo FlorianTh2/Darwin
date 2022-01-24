@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Web;
 using hello_asp_identity.Contracts.V1;
+using hello_asp_identity.Contracts.V1.Responses;
 using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
 using hello_asp_identity.Domain.Enums;
@@ -349,10 +350,7 @@ public class IdentityService : IIdentityService
             return new Result { Success = false, Errors = new string[] { "Unknown error." } };
         }
 
-        return new Result()
-        {
-            Success = true
-        };
+        return new Result() { Success = true };
     }
 
     public async Task<Result> PasswordUpdateAsync(int userId, string password, string newPassword)
@@ -372,25 +370,124 @@ public class IdentityService : IIdentityService
             };
         }
 
-        return new Result()
+        return new Result() { Success = true };
+    }
+
+    public async Task<Result> UsernameUpdateAsync(int userId, string newUsername)
+    {
+        var user = await _userService.GetUserByIdAsync(userId);
+        if (user == null)
         {
-            Success = true
+            return new Result { Success = false, Errors = new string[] { "User not found." } };
+        }
+        user.UserName = newUsername;
+        var identityResult_updateUser = await _userManager.UpdateAsync(user);
+        if (!identityResult_updateUser.Succeeded)
+        {
+            return new Result
+            {
+                Success = false,
+                Errors = identityResult_updateUser.Errors.Select(a => a.Description)
+            };
+        }
+
+        return new Result() { Success = true };
+    }
+
+    public async Task<EmailResetResult> EmailUpdateAsync(int userId, string oldEmail, string unConfirmedEmail)
+    {
+        var user = await _userService.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return new EmailResetResult { Success = false, Errors = new string[] { "User not found." } };
+        }
+
+        if (user.Email != oldEmail)
+        {
+            return new EmailResetResult
+            {
+                Success = false,
+                Errors = new string[] {
+                "Given oldEmail does not correspond to the email the user with given userId is using."
+                }
+            };
+        }
+
+        var userInSystem = await _userManager.FindByEmailAsync(unConfirmedEmail);
+        if (userInSystem != null)
+        {
+            return new EmailResetResult
+            {
+                Success = false,
+                Errors = new[] { "User with this email address already exists" }
+            };
+        }
+
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        user.UnConfirmedEmail = unConfirmedEmail;
+        user.EmailConfirmationToken = token;
+        user.EmailConfirmationTokenValidTo = _dateTimeService.Now.Add(_emailProviderOptions.TokenLifespan);
+        var identityResult_updateUser = await _userManager.UpdateAsync(user);
+        if (!identityResult_updateUser.Succeeded)
+        {
+            return new EmailResetResult
+            {
+                Success = false,
+                Errors = identityResult_updateUser.Errors.Select(a => a.Description)
+            };
+        }
+        var callbackUrl = _uriService.GetBaseUri()
+                               + ApiRoutes.Identity.EmailUpdateConfirm
+                               + "?UserId="
+                               + user.Id
+                               + "&EmailConfirmationToken="
+                               + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
+
+        return new EmailResetResult
+        {
+            Success = true,
+            CallbackUrl = callbackUrl
         };
     }
 
-    public async Task<Result> UsernameUpdateAsync(int userId, string password, string newPassword)
+    public async Task<Result> EmailUpdateConfirmAsync(int userId, string token)
     {
-        return null;
-    }
+        var user = await _userService.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return new Result() { Success = false, Errors = new string[] { "User not found." } };
+        }
 
-    public async Task<EmailResetResult> EmailUpdateAsync(int userId, string password, string newPassword)
-    {
-        return null;
-    }
+        if (user.EmailConfirmed)
+        {
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "Users email already confirmed." } };
+        }
+        if (user.EmailConfirmationToken == null || user.EmailConfirmationToken != token)
+        {
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "EmailConfirmationToken not valid." } };
+        }
+        if (user.EmailConfirmationTokenValidTo < _dateTimeService.Now)
+        {
+            user.EmailConfirmationToken = null;
+            user.EmailConfirmationTokenValidTo = null;
+            await _userManager.UpdateAsync(user);
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "EmailConfirmationToken expired." } };
+        }
+        var identityResult_confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
+        if (!identityResult_confirmEmail.Succeeded)
+        {
+            user.EmailConfirmationToken = null;
+            user.EmailConfirmationTokenValidTo = null;
+            await _userManager.UpdateAsync(user);
+            return new AuthenticationResult() { Success = false, Errors = identityResult_confirmEmail.Errors.Select(a => a.Description) };
+        }
 
-    public async Task<Result> EmailUpdateConfirmAsync(string password, string newPassword)
-    {
-        return null;
+        user.EmailConfirmationToken = null;
+        user.EmailConfirmationTokenValidTo = null;
+        await _userManager.UpdateAsync(user);
+
+        return await CreateToken(user);
     }
 
     private ClaimsPrincipal? GetPrincipalFromToken(string token)
@@ -438,7 +535,8 @@ public class IdentityService : IIdentityService
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 // general claims for frontend
                 new Claim(JwtRegisteredClaimNames.Email, appUser.Email),
-                new Claim("username", appUser.UserName)
+                new Claim("username", appUser.UserName),
+                new Claim("email_verified", appUser.EmailConfirmed.ToString())
             };
 
         // user-claims

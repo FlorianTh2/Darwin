@@ -16,9 +16,9 @@ public interface IIdentityService
     Task<PasswordResetByAdminResult> PasswordResetByAdminAsync(string email);
     Task<Result> PasswordResetConfirmAsync(int userId, string token, string password);
     Task<Result> PasswordUpdateAsync(int userId, string password, string newPassword);
-    Task<Result> UsernameUpdateAsync(int userId, string password, string newPassword);
-    Task<EmailResetResult> EmailUpdateAsync(int userId, string password, string newPassword);
-    Task<Result> EmailUpdateConfirmAsync(string password, string newPassword);
+    Task<Result> UsernameUpdateAsync(int userId, string newUsername);
+    Task<EmailResetResult> EmailUpdateAsync(int userId, string oldEmail, string unConfirmedEmail);
+    Task<Result> EmailUpdateConfirmAsync(int userId, string token);
     Task<Result> DeleteUserByIdAsync(int userId);
     Task<bool> IsInRoleAsync(int userId, string role);
 }

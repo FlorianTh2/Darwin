@@ -205,14 +205,6 @@ public class IdentityController : AppControllerBase
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<PasswordUpdateResponse>>> PasswordUpdate([FromRoute] int userId, [FromBody] IdentityPasswordUpdateRequest request)
     {
-        // to identitfy user: extract userId from Token
-
-        // var user = await UserManager.FindByIdAsync(id);
-
-        // var token = await UserManager.GeneratePasswordResetTokenAsync(user);
-
-        // var result = await UserManager.ResetPasswordAsync(user, token, "MyN3wP@ssw0rd");
-
         var serviceResponse = await _identityService.PasswordUpdateAsync(userId, request.Password, request.NewPassword);
 
         if (!serviceResponse.Success)
@@ -229,22 +221,59 @@ public class IdentityController : AppControllerBase
     }
 
     [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<UsernameUpdateResponse>>> UsernameUpdate([FromRoute] Guid userId, [FromBody] IdentityUsernameUpdateRequest request)
+    public async Task<ActionResult<Response<UsernameUpdateResponse>>> UsernameUpdate([FromRoute] int userId, [FromBody] IdentityUsernameUpdateRequest request)
     {
-        return Ok();
+
+        var serviceResponse = await _identityService.UsernameUpdateAsync(userId, request.NewUsername);
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
+        return Ok(new Response<UsernameUpdateResponse>(new UsernameUpdateResponse { Description = "Username updated successfully" }));
     }
 
     [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<EmailUpdateResponse>>> EmailUpdate([FromRoute] int userId, [FromBody] IdentityEmailUpdateRequest request)
     {
-        return Ok();
+        var serviceResponse = await _identityService.EmailUpdateAsync(userId, request.OldEmail, request.UnConfirmedEmail);
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
+        return Ok(new Response<EmailUpdateResponse>(new EmailUpdateResponse { Description = "Confirmation email sent to new email address." }));
     }
 
     [HttpGet(ApiRoutes.Identity.EmailUpdateConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<EmailUpdateConfirmResponse>>> EmailUpdateConfirm([FromQuery] IdentityEmailUpdateConfirmRequest request)
     {
-        // SendEmailConfirmationWarningAsync
-        return Ok();
+
+        var serviceResponse = await _identityService.EmailUpdateConfirmAsync(request.UserId, request.EmailConfirmationToken);
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = serviceResponse.Errors.Select((string a) =>
+                {
+                    return new ErrorModel() { Message = a };
+                }).ToList()
+            });
+        }
+        return Ok(new Response<EmailUpdateResponse>(new EmailUpdateResponse { Description = "Confirmation email sent to new email address." }));
     }
 
     [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]

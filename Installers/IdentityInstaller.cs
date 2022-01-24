@@ -28,6 +28,7 @@ public static class IdentityInstaller
         services.Configure<IdentityOptions>(a =>
         {
             a.Password.RequiredLength = accountSecruityOptions.PasswordLength;
+            a.User.RequireUniqueEmail = true;
             a.Password.RequireNonAlphanumeric = true;
             a.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
             a.Lockout.AllowedForNewUsers = true;
