@@ -19,9 +19,6 @@ namespace hello_asp_identity.Controllers.V1;
 
 public class IdentityController : AppControllerBase
 {
-    private readonly UserManager<AppUser> _userManager;
-    private readonly SignInManager<AppUser> _signInManager;
-    private readonly AppDbContext _dbContext;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IMapper _mapper;
     private readonly IUserService _userService;
