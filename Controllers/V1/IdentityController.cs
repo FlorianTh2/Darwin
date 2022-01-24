@@ -3,15 +3,10 @@ using hello_asp_identity.Attributes;
 using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Contracts.V1.Responses;
-using hello_asp_identity.Data;
-using hello_asp_identity.Domain;
 using hello_asp_identity.Domain.Enums;
-using hello_asp_identity.Domain.Results;
-using hello_asp_identity.Entities;
 using hello_asp_identity.Extensions;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -54,12 +49,17 @@ public class IdentityController : AppControllerBase
             request.Password,
             request.DOB.FromIso8601StringToDateTime()
         );
+
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
+            ));
         }
 
-        return Ok(new Response<RegisterResponse>(_mapper.Map<RegisterResponse>(serviceResponse.Data)));
+        return Ok(new Response<RegisterResponse>(
+            _mapper.Map<RegisterResponse>(serviceResponse.Data)
+        ));
     }
 
     [AllowAnonymous]
@@ -67,11 +67,17 @@ public class IdentityController : AppControllerBase
     public async Task<ActionResult<Response<AuthResponse>>> RegisterConfirm([FromQuery] IdentityRegisterConfirmRequest request)
     {
         var serviceResponse = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
+
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
+            ));
         }
-        return Ok(new Response<AuthResponse>(_mapper.Map<AuthResponse>(serviceResponse.Data)));
+
+        return Ok(new Response<AuthResponse>(
+            _mapper.Map<AuthResponse>(serviceResponse.Data)
+        ));
     }
 
     [AllowAnonymous]
@@ -82,9 +88,14 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
+            ));
         }
-        return Ok(new Response<AuthResponse>(_mapper.Map<AuthResponse>(serviceResponse.Data)));
+
+        return Ok(new Response<AuthResponse>(
+            _mapper.Map<AuthResponse>(serviceResponse.Data)
+        ));
     }
 
     [AllowAnonymous]
@@ -95,10 +106,14 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
+            ));
         }
 
-        return Ok(new Response<AuthResponse>(_mapper.Map<AuthResponse>(serviceResponse.Data)));
+        return Ok(new Response<AuthResponse>(
+            _mapper.Map<AuthResponse>(serviceResponse.Data)
+        ));
     }
 
     [AllowAnonymous]
@@ -109,9 +124,14 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
+            ));
         }
-        return Ok(new Response<PasswordResetResponse>(new PasswordResetResponse { Description = "Started reset password, email sent." }));
+
+        return Ok(new Response<PasswordResetResponse>(
+            new PasswordResetResponse { Description = "Started reset password, email sent." }
+        ));
     }
 
     [AuthorizeRoles(Roles.Admin, Roles.SuperAdmin)]
@@ -122,9 +142,14 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
+            ));
         }
-        return Ok(new Response<PasswordResetByAdminResponse>(_mapper.Map<PasswordResetByAdminResponse>(serviceResponse.Data)));
+
+        return Ok(new Response<PasswordResetByAdminResponse>(
+            _mapper.Map<PasswordResetByAdminResponse>(serviceResponse.Data)
+        ));
     }
 
     [AllowAnonymous]
@@ -139,10 +164,14 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
-
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
+            ));
         }
-        return Ok(new Response<PasswordResetConfirmResponse>(new PasswordResetConfirmResponse { Description = "Password resetted, please login." }));
+
+        return Ok(new Response<PasswordResetConfirmResponse>(
+            new PasswordResetConfirmResponse { Description = "Password resetted, please login." }
+        ));
     }
 
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
@@ -152,17 +181,23 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
-
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+            ));
         }
 
         var serviceResponse = await _identityService.PasswordUpdateAsync(userId, request.Password, request.NewPassword);
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
+            ));
         }
-        return Ok(new Response<PasswordUpdateResponse>(new PasswordUpdateResponse { Description = "Password updated successfully" }));
+
+        return Ok(new Response<PasswordUpdateResponse>(
+            new PasswordUpdateResponse { Description = "Password updated successfully" }
+        ));
     }
 
     [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
@@ -172,16 +207,23 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+            ));
         }
 
         var serviceResponse = await _identityService.UsernameUpdateAsync(userId, request.NewUsername);
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+            ));
         }
-        return Ok(new Response<UsernameUpdateResponse>(new UsernameUpdateResponse { Description = "Username updated successfully" }));
+
+        return Ok(new Response<UsernameUpdateResponse>(
+            new UsernameUpdateResponse { Description = "Username updated successfully" }
+        ));
     }
 
     [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
@@ -191,21 +233,23 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = new List<ErrorModelResponse>() {
-                    new ErrorModelResponse() { Message = "You can not modify this ressource." }
-                }
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+            ));
         }
 
         var serviceResponse = await _identityService.EmailUpdateAsync(userId, request.OldEmail, request.UnConfirmedEmail);
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+            ));
         }
-        return Ok(new Response<EmailUpdateResponse>(new EmailUpdateResponse { Description = "Confirmation email sent to new email address." }));
+
+        return Ok(new Response<EmailUpdateResponse>(
+            new EmailUpdateResponse { Description = "Confirmation email sent to new email address." }
+        ));
     }
 
     [AllowAnonymous]
@@ -219,9 +263,14 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+            ));
         }
-        return Ok(new Response<EmailUpdateResponse>(new EmailUpdateResponse { Description = "Users email updated, pls login again." }));
+
+        return Ok(new Response<EmailUpdateResponse>(
+            new EmailUpdateResponse { Description = "Users email updated, pls login again." }
+        ));
     }
 
     [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]
@@ -231,7 +280,9 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+            ));
         }
 
         var deleted = await _identityService.DeleteUserByIdAsync(userId);
