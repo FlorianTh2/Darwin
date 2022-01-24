@@ -459,9 +459,9 @@ public class IdentityService : IIdentityService
             return new Result() { Success = false, Errors = new string[] { "User not found." } };
         }
 
-        if (user.EmailConfirmed)
+        if (string.IsNullOrEmpty(user.UnConfirmedEmail))
         {
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "Users email already confirmed." } };
+            return new AuthenticationResult() { Success = false, Errors = new string[] { "User has no newEmail stored." } };
         }
         if (user.EmailConfirmationToken == null || user.EmailConfirmationToken != token)
         {
@@ -469,25 +469,37 @@ public class IdentityService : IIdentityService
         }
         if (user.EmailConfirmationTokenValidTo < _dateTimeService.Now)
         {
+            user.UnConfirmedEmail = null;
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
             return new AuthenticationResult() { Success = false, Errors = new string[] { "EmailConfirmationToken expired." } };
         }
-        var identityResult_confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
-        if (!identityResult_confirmEmail.Succeeded)
+        var identityResult_confirmNewEmail = await _userManager.ConfirmEmailAsync(user, token);
+        if (!identityResult_confirmNewEmail.Succeeded)
         {
+            user.UnConfirmedEmail = null;
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new AuthenticationResult() { Success = false, Errors = identityResult_confirmEmail.Errors.Select(a => a.Description) };
+            return new AuthenticationResult() { Success = false, Errors = identityResult_confirmNewEmail.Errors.Select(a => a.Description) };
         }
-
+        user.Email = user.UnConfirmedEmail;
+        user.UnConfirmedEmail = null;
         user.EmailConfirmationToken = null;
         user.EmailConfirmationTokenValidTo = null;
-        await _userManager.UpdateAsync(user);
+        var identityResult_updateUser = await _userManager.UpdateAsync(user);
 
-        return await CreateToken(user);
+        if (!identityResult_updateUser.Succeeded)
+        {
+            user.UnConfirmedEmail = null;
+            user.EmailConfirmationToken = null;
+            user.EmailConfirmationTokenValidTo = null;
+            await _userManager.UpdateAsync(user);
+            return new AuthenticationResult() { Success = false, Errors = identityResult_updateUser.Errors.Select(a => a.Description) };
+        }
+        return new Result() { Success = true };
+
     }
 
     private ClaimsPrincipal? GetPrincipalFromToken(string token)
@@ -526,18 +538,14 @@ public class IdentityService : IIdentityService
         // https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
         //  - no pii (personal identifying information) preferable
         var claims = new List<Claim>
-            {
-                // include to search directly for a possible user foreign key
-                new Claim(JwtRegisteredClaimNames.Sub, appUser.Id.ToString()),
-                // include to give token an id, later retrievable via token.id
-                // if not specified token.id == null
-                // token.id needed for refreshtoken
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                // general claims for frontend
-                new Claim(JwtRegisteredClaimNames.Email, appUser.Email),
-                new Claim("username", appUser.UserName),
-                new Claim("email_verified", appUser.EmailConfirmed.ToString())
-            };
+        {
+            // include to give token an id, later retrievable via token.id
+            // token.id needed for refreshtoken
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Sub, appUser.Id.ToString()),
+            new Claim("username", appUser.UserName),
+            new Claim(JwtRegisteredClaimNames.Email, appUser.Email)
+        };
 
         // user-claims
         // - claims added to individual users like for example that way:

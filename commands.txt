@@ -46,3 +46,12 @@ gucken dass [authorize] auch danach schaut, dass email bestätigt ist (da evt. s
 passwort/username/email/... reset -> invalidate refreshtoken
 
 callbackuri-creation in uriservice auslagern
+
+
+dotnet new sln --name FooBar
+dotnet new console --name Foo --output Foo
+dotnet new console --name Bar --output Bar
+dotnet sln add .\Foo\Foo.csproj
+dotnet sln add .\Bar\Bar.csproj
+dotnet restore
+dotnet build FooBar.sln

@@ -205,6 +205,18 @@ public class IdentityController : AppControllerBase
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<PasswordUpdateResponse>>> PasswordUpdate([FromRoute] int userId, [FromBody] IdentityPasswordUpdateRequest request)
     {
+        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
+
+        if (!userOwnsUser)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = new List<ErrorModel>() {
+                    new ErrorModel() { Message = "You can not delete another user." }
+                }
+            });
+        }
+
         var serviceResponse = await _identityService.PasswordUpdateAsync(userId, request.Password, request.NewPassword);
 
         if (!serviceResponse.Success)
@@ -223,6 +235,17 @@ public class IdentityController : AppControllerBase
     [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<UsernameUpdateResponse>>> UsernameUpdate([FromRoute] int userId, [FromBody] IdentityUsernameUpdateRequest request)
     {
+        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
+
+        if (!userOwnsUser)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = new List<ErrorModel>() {
+                    new ErrorModel() { Message = "You can not delete another user." }
+                }
+            });
+        }
 
         var serviceResponse = await _identityService.UsernameUpdateAsync(userId, request.NewUsername);
 
@@ -242,6 +265,18 @@ public class IdentityController : AppControllerBase
     [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<EmailUpdateResponse>>> EmailUpdate([FromRoute] int userId, [FromBody] IdentityEmailUpdateRequest request)
     {
+        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
+
+        if (!userOwnsUser)
+        {
+            return BadRequest(new ErrorResponse<ErrorModel>()
+            {
+                Errors = new List<ErrorModel>() {
+                    new ErrorModel() { Message = "You can not delete another user." }
+                }
+            });
+        }
+
         var serviceResponse = await _identityService.EmailUpdateAsync(userId, request.OldEmail, request.UnConfirmedEmail);
 
         if (!serviceResponse.Success)
@@ -257,11 +292,14 @@ public class IdentityController : AppControllerBase
         return Ok(new Response<EmailUpdateResponse>(new EmailUpdateResponse { Description = "Confirmation email sent to new email address." }));
     }
 
+    [AllowAnonymous]
     [HttpGet(ApiRoutes.Identity.EmailUpdateConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<EmailUpdateConfirmResponse>>> EmailUpdateConfirm([FromQuery] IdentityEmailUpdateConfirmRequest request)
     {
-
-        var serviceResponse = await _identityService.EmailUpdateConfirmAsync(request.UserId, request.EmailConfirmationToken);
+        var serviceResponse = await _identityService.EmailUpdateConfirmAsync(
+            request.UserId,
+            request.EmailConfirmationToken
+        );
 
         if (!serviceResponse.Success)
         {
@@ -273,7 +311,7 @@ public class IdentityController : AppControllerBase
                 }).ToList()
             });
         }
-        return Ok(new Response<EmailUpdateResponse>(new EmailUpdateResponse { Description = "Confirmation email sent to new email address." }));
+        return Ok(new Response<EmailUpdateResponse>(new EmailUpdateResponse { Description = "Users email updated, pls login again." }));
     }
 
     [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]
