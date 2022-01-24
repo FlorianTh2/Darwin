@@ -107,17 +107,18 @@ public class IdentityService : IIdentityService
         user.EmailConfirmed = false;
         var identityResult_updateEmail = await _userManager.UpdateAsync(user);
 
-        var callbackUrl = _uriService.GetBaseUri()
-                               + ApiRoutes.Identity.RegisterConfirm
-                               + "?UserId="
-                               + user.Id
-                               + "&Token="
-                               + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
+        var callbackUrl = _uriService.GetUriWithParameters(
+            ApiRoutes.Identity.RegisterConfirm,
+            new Dictionary<string, string>
+            {
+                {"UserId", user.Id.ToString()},
+                {"Token", HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8)}
+            });
 
         return new Result<RegisterResult>()
         {
             Success = true,
-            Data = new RegisterResult() { CallbackUrl = callbackUrl }
+            Data = new RegisterResult() { CallbackUrl = callbackUrl.OriginalString }
         };
     }
 
@@ -267,18 +268,18 @@ public class IdentityService : IIdentityService
         {
             return new Result<PasswordResetResult> { Errors = update_result.Errors.Select(a => a.Description).ToList() };
         }
-
-        var callbackUrl = _uriService.GetBaseUri()
-                               + ApiRoutes.Identity.PasswordReset
-                               + "?UserId="
-                               + user.Id
-                               + "&Token="
-                               + HttpUtility.UrlEncode(resetToken, System.Text.Encoding.UTF8);
+        var callbackUrl = _uriService.GetUriWithParameters(
+            ApiRoutes.Identity.RegisterConfirm,
+            new Dictionary<string, string>
+            {
+                {"UserId", user.Id.ToString()},
+                {"Token", HttpUtility.UrlEncode(resetToken, System.Text.Encoding.UTF8)}
+            });
 
         return new Result<PasswordResetResult>()
         {
             Success = true,
-            Data = new PasswordResetResult() { CallbackUrl = callbackUrl }
+            Data = new PasswordResetResult() { CallbackUrl = callbackUrl.OriginalString }
         };
     }
 
@@ -408,17 +409,19 @@ public class IdentityService : IIdentityService
         {
             return new Result<EmailResetResult> { Errors = identityResult_updateUser.Errors.Select(a => a.Description).ToList() };
         }
-        var callbackUrl = _uriService.GetBaseUri()
-                               + ApiRoutes.Identity.EmailUpdateConfirm
-                               + "?UserId="
-                               + user.Id
-                               + "&EmailConfirmationToken="
-                               + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
+
+        var callbackUrl = _uriService.GetUriWithParameters(
+            ApiRoutes.Identity.RegisterConfirm,
+            new Dictionary<string, string>
+            {
+                {"UserId", user.Id.ToString()},
+                {"EmailConfirmationToken", HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8)}
+            });
 
         return new Result<EmailResetResult>
         {
             Success = true,
-            Data = new EmailResetResult() { CallbackUrl = callbackUrl }
+            Data = new EmailResetResult() { CallbackUrl = callbackUrl.OriginalString }
         };
     }
 

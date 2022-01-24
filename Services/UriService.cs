@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Web;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.WebUtilities;
@@ -20,12 +21,12 @@ public class UriService : IUriService
 
     public Uri GetUri(string apiRoute, string id)
     {
-        return new Uri(_baseUri + Regex.Replace(apiRoute, "{.*?}", id));
+        return new Uri(GetBaseUri(), Regex.Replace(apiRoute, "{.*?}", id));
     }
 
     public Uri GetAllUri(string apiRoute, PaginationQuery? pagination = null)
     {
-        var uri = new Uri(_baseUri + apiRoute);
+        var uri = new Uri(GetBaseUri(), apiRoute);
 
         if (pagination == null)
         {
@@ -35,5 +36,17 @@ public class UriService : IUriService
         var modifiedUri = QueryHelpers.AddQueryString(uri.ToString(), "pageNumber", pagination.PageNumber.ToString());
         modifiedUri = QueryHelpers.AddQueryString(modifiedUri, "pageSize", pagination.PageSize.ToString());
         return new Uri(modifiedUri);
+    }
+
+    public Uri GetUriWithParameters(string apiRoute, Dictionary<string, string> parameters)
+    {
+        var uriBuilder = new UriBuilder(GetBaseUri());
+        var query = HttpUtility.ParseQueryString(uriBuilder.Query);
+        foreach (KeyValuePair<string, string> entry in parameters)
+        {
+            query[entry.Key] = entry.Value;
+        }
+        uriBuilder.Query = query.ToString();
+        return uriBuilder.Uri;
     }
 }
