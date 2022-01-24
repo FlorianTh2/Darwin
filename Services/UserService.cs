@@ -1,8 +1,8 @@
 using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
+using hello_asp_identity.Domain.Results;
 using hello_asp_identity.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 
 namespace hello_asp_identity.Services;
 
@@ -16,7 +16,7 @@ public class UserService : IUserService
         _dbContext = dbContext;
     }
 
-    public async Task<GetAllServiceResult<AppUser>> GetUsersAsync(
+    public async Task<Result<GetAllServiceResult<AppUser>>> GetUsersAsync(
         GetAllUsersFilter filter,
         PaginationFilter paginationFilter
     )
@@ -44,23 +44,40 @@ public class UserService : IUserService
                 .ToListAsync(),
         };
 
-        return serviceResponse;
+        return new Result<GetAllServiceResult<AppUser>>()
+        {
+            Success = true,
+            Data = serviceResponse
+        };
     }
 
-    public async Task<AppUser?> GetUserByIdAsync(int userId)
+    public async Task<Result<AppUser>> GetUserByIdAsync(int userId)
     {
-        return await _dbContext.Users
+        var data = await _dbContext.Users
             .AsNoTracking()
             .Include(a => a.UserRoles)
             .ThenInclude(a => a.Role)
             .FirstOrDefaultAsync(a => a.Id == userId);
+
+        if (data == null)
+        {
+            return new Result<AppUser>();
+        }
+
+        return new Result<AppUser>()
+        {
+            Success = true,
+            Data = data
+        };
+
     }
 
-    public async Task<bool> UpdateUserAsync(AppUser userToUpdate)
+    public async Task<Result<bool>> UpdateUserAsync(AppUser userToUpdate)
     {
         _dbContext.Users.Update(userToUpdate);
         var updated = await _dbContext.SaveChangesAsync();
-        return updated > 0;
+        return new Result<bool>() { Success = true, Data = updated > 0 };
+
     }
 
     private IQueryable<AppUser> AddFiltersOnQuery(
@@ -77,7 +94,7 @@ public class UserService : IUserService
         return queryable;
     }
 
-    public async Task<bool> UserOwnsUserAsync(int userId, string userIdRequestAuthor)
+    public async Task<Result<bool>> UserOwnsUserAsync(int userId, string userIdRequestAuthor)
     {
         var user = await _dbContext
             .Users
@@ -86,14 +103,15 @@ public class UserService : IUserService
 
         if (user == null)
         {
-            return false;
+            return new Result<bool>() { Success = true, Data = false };
         }
 
         if (user.Id.ToString() != userIdRequestAuthor)
         {
-            return false;
+            return new Result<bool>() { Success = true, Data = false };
         }
 
-        return true;
+        return new Result<bool>() { Success = true, Data = true };
+
     }
 }

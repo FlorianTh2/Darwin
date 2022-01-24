@@ -177,12 +177,12 @@ public class IdentityController : AppControllerBase
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<PasswordUpdateResponse>>> PasswordUpdate([FromRoute] int userId, [FromBody] IdentityPasswordUpdateRequest request)
     {
-        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
+        var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUser)
+        if (!userOwnsUserResult.Data)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
             ));
         }
 
@@ -203,12 +203,12 @@ public class IdentityController : AppControllerBase
     [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<UsernameUpdateResponse>>> UsernameUpdate([FromRoute] int userId, [FromBody] IdentityUsernameUpdateRequest request)
     {
-        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
+        var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUser)
+        if (!userOwnsUserResult.Data)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
             ));
         }
 
@@ -217,7 +217,7 @@ public class IdentityController : AppControllerBase
         if (!serviceResponse.Success)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
             ));
         }
 
@@ -229,12 +229,12 @@ public class IdentityController : AppControllerBase
     [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<EmailUpdateResponse>>> EmailUpdate([FromRoute] int userId, [FromBody] IdentityEmailUpdateRequest request)
     {
-        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
+        var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUser)
+        if (!userOwnsUserResult.Data)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
             ));
         }
 
@@ -243,7 +243,7 @@ public class IdentityController : AppControllerBase
         if (!serviceResponse.Success)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
             ));
         }
 
@@ -264,7 +264,7 @@ public class IdentityController : AppControllerBase
         if (!serviceResponse.Success)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
             ));
         }
 
@@ -276,12 +276,12 @@ public class IdentityController : AppControllerBase
     [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]
     public async Task<IActionResult> Delete([FromRoute] int userId)
     {
-        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
+        var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUser)
+        if (!userOwnsUserResult.Data)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
             ));
         }
 

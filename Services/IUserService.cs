@@ -1,19 +1,20 @@
 using hello_asp_identity.Domain;
+using hello_asp_identity.Domain.Results;
 using hello_asp_identity.Entities;
 
 namespace hello_asp_identity.Services;
 
 public interface IUserService
 {
-    Task<GetAllServiceResult<AppUser>> GetUsersAsync(
+    Task<Result<GetAllServiceResult<AppUser>>> GetUsersAsync(
         GetAllUsersFilter filter,
         PaginationFilter paginationFilter
     );
 
-    Task<AppUser?> GetUserByIdAsync(int userId);
+    Task<Result<AppUser>> GetUserByIdAsync(int userId);
 
     // update only non-identity user fields (atm: dob)
-    Task<bool> UpdateUserAsync(AppUser userToUpdate);
+    Task<Result<bool>> UpdateUserAsync(AppUser userToUpdate);
 
-    Task<bool> UserOwnsUserAsync(int userId, string userIdRequestAuthor);
+    Task<Result<bool>> UserOwnsUserAsync(int userId, string userIdRequestAuthor);
 }

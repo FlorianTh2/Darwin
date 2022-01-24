@@ -47,22 +47,48 @@ public class UserController : AppControllerBase
         var filter = _mapper.Map<GetAllUsersFilter>(query);
 
         var serviceResponse = await _userService.GetUsersAsync(filter, paginationFilter);
+
+        if (!serviceResponse.Success)
+        {
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
+            ));
+        }
+
         var usersResponse = _mapper.Map<List<UserResponse>>(serviceResponse.Data);
 
-        return Ok(PaginationHelper.CreatePaginatedResponse(_uriService, ApiRoutes.User.GetAll, paginationFilter, usersResponse, serviceResponse.TotalNumber));
+        return Ok(PaginationHelper.CreatePaginatedResponse(
+            _uriService,
+            ApiRoutes.User.GetAll,
+            paginationFilter,
+            usersResponse,
+            serviceResponse.Data.TotalNumber
+        ));
 
     }
 
     [HttpGet(ApiRoutes.User.Get, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<UserResponse>>> Get([FromRoute] int userId)
     {
+        var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        var user = await _userService.GetUserByIdAsync(userId);
+        if (!userOwnsUserResult.Data)
+        {
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
+            ));
+        }
 
-        if (user == null)
+        var serviceResponse = await _userService.GetUserByIdAsync(userId);
+
+        if (!serviceResponse.Success)
+        {
             return NotFound();
+        }
 
-        return Ok(new Response<UserResponse>(_mapper.Map<UserResponse>(user)));
+        return Ok(new Response<UserResponse>(
+            _mapper.Map<UserResponse>(serviceResponse.Data)
+        ));
     }
 
     [HttpPut(ApiRoutes.User.Update, Name = "[controller]_[action]")]
@@ -71,26 +97,28 @@ public class UserController : AppControllerBase
         [FromBody] UserUpdateRequest request
     )
     {
-        var userOwnsUser = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
+        var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUser)
+        if (!userOwnsUserResult.Data)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = new List<ErrorModelResponse>() {
-                    new ErrorModelResponse() { Message = "You can not change user data of another user" }
-                }
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
+            ));
         }
-        var user = (await _userService.GetUserByIdAsync(userId))!;
+
+        var userResult = (await _userService.GetUserByIdAsync(userId))!;
 
         // following properties can be updated currently:
-        user.DOB = request.DOB.FromIso8601StringToDateTime();
+        userResult.Data.DOB = request.DOB.FromIso8601StringToDateTime();
 
-        var updated = await _userService.UpdateUserAsync(user);
+        var updated = await _userService.UpdateUserAsync(userResult.Data);
 
-        if (updated)
-            return Ok(new Response<UserResponse>(_mapper.Map<UserResponse>(user)));
+        if (updated.Data)
+        {
+            return Ok(new Response<UserResponse>(
+                _mapper.Map<UserResponse>(userResult.Data)
+            ));
+        }
 
         return NotFound();
     }
