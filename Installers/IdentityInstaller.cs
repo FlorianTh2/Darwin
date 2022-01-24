@@ -12,7 +12,7 @@ public static class IdentityInstaller
     {
         var accountSecruityOptions = config.GetSection(AccountSecruityOptions.SectionName).Get<AccountSecruityOptions>();
 
-        var emailProviderName = "ActiveEmailConfirmationProvider";
+        var emailProviderName = "AppEmailConfirmationProvider";
         var passwordResetTokenProviderName = "AppResetPasswordTokenProvider";
 
         services.AddIdentityCore<AppUser>()
