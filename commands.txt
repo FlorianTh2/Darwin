@@ -35,7 +35,7 @@ docker-compose up
 https://0.0.0.0:5000/swagger/index.html
 docker-compose down
 
-weiter mit identity
+
 weiter mit basecontroller
 automapper einbauen
     description eventuell into service verlegen
@@ -46,6 +46,8 @@ gucken dass [authorize] auch danach schaut, dass email bestätigt ist (da evt. s
 passwort/username/email/... reset -> invalidate refreshtoken
 
 callbackuri-creation in uriservice auslagern
+
+validation for several identityController
 
 
 dotnet new sln --name FooBar

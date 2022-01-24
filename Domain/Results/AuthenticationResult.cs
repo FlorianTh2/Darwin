@@ -1,6 +1,6 @@
 namespace hello_asp_identity.Domain.Results;
 
-public class AuthenticationResult : Result
+public class AuthenticationResult
 {
     public string? AccessToken { get; set; }
 

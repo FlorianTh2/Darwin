@@ -56,16 +56,10 @@ public class IdentityController : AppControllerBase
         );
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModel() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<IEnumerable<ErrorModelResponse>>(serviceResponse.Errors)));
         }
 
-        return Ok(new Response<RegisterResponse>(new RegisterResponse { Description = "Started registration, email send." }));
+        return Ok(new Response<RegisterResponse>(_mapper.Map<RegisterResponse>(serviceResponse.Data)));
     }
 
     [AllowAnonymous]
@@ -75,11 +69,11 @@ public class IdentityController : AppControllerBase
         var serviceResponse = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -98,11 +92,11 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -122,11 +116,11 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -146,11 +140,11 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -165,11 +159,11 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -188,11 +182,11 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -206,10 +200,10 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
-                Errors = new List<ErrorModel>() {
-                    new ErrorModel() { Message = "You can not delete another user." }
+                Errors = new List<ErrorModelResponse>() {
+                    new ErrorModelResponse() { Message = "You can not modify this ressource." }
                 }
             });
         }
@@ -218,11 +212,11 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -236,10 +230,10 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
-                Errors = new List<ErrorModel>() {
-                    new ErrorModel() { Message = "You can not delete another user." }
+                Errors = new List<ErrorModelResponse>() {
+                    new ErrorModelResponse() { Message = "You can not modify this ressource." }
                 }
             });
         }
@@ -248,11 +242,11 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -266,10 +260,10 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
-                Errors = new List<ErrorModel>() {
-                    new ErrorModel() { Message = "You can not delete another user." }
+                Errors = new List<ErrorModelResponse>() {
+                    new ErrorModelResponse() { Message = "You can not modify this ressource." }
                 }
             });
         }
@@ -278,11 +272,11 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -300,11 +294,11 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
                 Errors = serviceResponse.Errors.Select((string a) =>
                 {
-                    return new ErrorModel() { Message = a };
+                    return new ErrorModelResponse() { Message = a };
                 }).ToList()
             });
         }
@@ -318,10 +312,10 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
-                Errors = new List<ErrorModel>() {
-                    new ErrorModel() { Message = "You can not delete another user." }
+                Errors = new List<ErrorModelResponse>() {
+                    new ErrorModelResponse() { Message = "You can not modify this ressource." }
                 }
             });
         }

@@ -75,10 +75,10 @@ public class UserController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModel>()
+            return BadRequest(new ErrorResponse<ErrorModelResponse>()
             {
-                Errors = new List<ErrorModel>() {
-                    new ErrorModel() { Message = "You can not change user data of another user" }
+                Errors = new List<ErrorModelResponse>() {
+                    new ErrorModelResponse() { Message = "You can not change user data of another user" }
                 }
             });
         }

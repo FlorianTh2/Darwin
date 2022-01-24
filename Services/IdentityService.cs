@@ -63,7 +63,7 @@ public class IdentityService : IIdentityService
         _emailProviderOptions = emailProviderOptions.Value;
     }
 
-    public async Task<RegisterResult> RegisterAsync(string username, string email, string password, DateTime dob)
+    public async Task<Result<RegisterResult>> RegisterAsync(string username, string email, string password, DateTime dob)
     {
         var userInSystem = await _dbContext
             .Users
@@ -71,9 +71,8 @@ public class IdentityService : IIdentityService
 
         if (userInSystem != null)
         {
-            return new RegisterResult
+            return new Result<RegisterResult>()
             {
-                Success = false,
                 Errors = new[] { "User with this email address already exists" }
             };
         }
@@ -89,9 +88,8 @@ public class IdentityService : IIdentityService
 
         if (!identityResult_userCreation.Succeeded)
         {
-            return new RegisterResult
+            return new Result<RegisterResult>()
             {
-                Success = false,
                 Errors = identityResult_userCreation.Errors.Select(a => a.Description)
             };
         }
@@ -113,10 +111,9 @@ public class IdentityService : IIdentityService
                                + "&Token="
                                + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
 
-        return new RegisterResult
+        return new Result<RegisterResult>
         {
-            Success = true,
-            CallbackUrl = callbackUrl
+            Data = new RegisterResult() { Description = "Started registration, email sent." }
         };
     }
 
