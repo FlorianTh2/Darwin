@@ -56,7 +56,7 @@ public class IdentityController : AppControllerBase
         );
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<IEnumerable<ErrorModelResponse>>(serviceResponse.Errors)));
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
         }
 
         return Ok(new Response<RegisterResponse>(_mapper.Map<RegisterResponse>(serviceResponse.Data)));
@@ -69,19 +69,9 @@ public class IdentityController : AppControllerBase
         var serviceResponse = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
         }
-        return Ok(new Response<AuthResponse>(new AuthResponse()
-        {
-            AccessToken = serviceResponse.AccessToken!,
-            RefreshToken = serviceResponse.RefreshToken!
-        }));
+        return Ok(new Response<AuthResponse>(_mapper.Map<AuthResponse>(serviceResponse.Data)));
     }
 
     [AllowAnonymous]
@@ -92,20 +82,9 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
         }
-
-        return Ok(new Response<AuthResponse>(new AuthResponse
-        {
-            AccessToken = serviceResponse.AccessToken!,
-            RefreshToken = serviceResponse.RefreshToken!
-        }));
+        return Ok(new Response<AuthResponse>(_mapper.Map<AuthResponse>(serviceResponse.Data)));
     }
 
     [AllowAnonymous]
@@ -116,20 +95,10 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
         }
 
-        return Ok(new Response<AuthResponse>(new AuthResponse
-        {
-            AccessToken = serviceResponse.AccessToken!,
-            RefreshToken = serviceResponse.RefreshToken!
-        }));
+        return Ok(new Response<AuthResponse>(_mapper.Map<AuthResponse>(serviceResponse.Data)));
     }
 
     [AllowAnonymous]
@@ -140,13 +109,7 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
         }
         return Ok(new Response<PasswordResetResponse>(new PasswordResetResponse { Description = "Started reset password, email sent." }));
     }
@@ -159,15 +122,9 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
         }
-        return Ok(new Response<PasswordResetByAdminResponse>(new PasswordResetByAdminResponse { NewPassword = serviceResponse.NewPassword! }));
+        return Ok(new Response<PasswordResetByAdminResponse>(_mapper.Map<PasswordResetByAdminResponse>(serviceResponse.Data)));
     }
 
     [AllowAnonymous]
@@ -182,13 +139,8 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
+
         }
         return Ok(new Response<PasswordResetConfirmResponse>(new PasswordResetConfirmResponse { Description = "Password resetted, please login." }));
     }
@@ -200,25 +152,15 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = new List<ErrorModelResponse>() {
-                    new ErrorModelResponse() { Message = "You can not modify this ressource." }
-                }
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
+
         }
 
         var serviceResponse = await _identityService.PasswordUpdateAsync(userId, request.Password, request.NewPassword);
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)));
         }
         return Ok(new Response<PasswordUpdateResponse>(new PasswordUpdateResponse { Description = "Password updated successfully" }));
     }
@@ -230,25 +172,14 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = new List<ErrorModelResponse>() {
-                    new ErrorModelResponse() { Message = "You can not modify this ressource." }
-                }
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
         }
 
         var serviceResponse = await _identityService.UsernameUpdateAsync(userId, request.NewUsername);
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
         }
         return Ok(new Response<UsernameUpdateResponse>(new UsernameUpdateResponse { Description = "Username updated successfully" }));
     }
@@ -272,13 +203,7 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
         }
         return Ok(new Response<EmailUpdateResponse>(new EmailUpdateResponse { Description = "Confirmation email sent to new email address." }));
     }
@@ -294,13 +219,7 @@ public class IdentityController : AppControllerBase
 
         if (!serviceResponse.Success)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = serviceResponse.Errors.Select((string a) =>
-                {
-                    return new ErrorModelResponse() { Message = a };
-                }).ToList()
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
         }
         return Ok(new Response<EmailUpdateResponse>(new EmailUpdateResponse { Description = "Users email updated, pls login again." }));
     }
@@ -312,12 +231,7 @@ public class IdentityController : AppControllerBase
 
         if (!userOwnsUser)
         {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>()
-            {
-                Errors = new List<ErrorModelResponse>() {
-                    new ErrorModelResponse() { Message = "You can not modify this ressource." }
-                }
-            });
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(_mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not modify this ressource." })));
         }
 
         var deleted = await _identityService.DeleteUserByIdAsync(userId);

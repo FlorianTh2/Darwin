@@ -6,9 +6,9 @@ namespace hello_asp_identity.Services;
 public interface IIdentityService
 {
     Task<Result<RegisterResult>> RegisterAsync(string username, string email, string password, DateTime dbo);
-    Task<Result<AuthenticationResult>> RegisterConfirmAsync(int userId, string token);
-    Task<Result<AuthenticationResult>> LoginAsync(string username, string password);
-    Task<Result<AuthenticationResult>> RefreshTokenAsync(string accessToken, string refreshToken);
+    Task<Result<AuthResult>> RegisterConfirmAsync(int userId, string token);
+    Task<Result<AuthResult>> LoginAsync(string username, string password);
+    Task<Result<AuthResult>> RefreshTokenAsync(string accessToken, string refreshToken);
     Task<Result<PasswordResetResult>> PasswordResetAsync(string email);
 
     // maybe important in cases where user cant reset his password himself
@@ -19,6 +19,6 @@ public interface IIdentityService
     Task<Result> UsernameUpdateAsync(int userId, string newUsername);
     Task<Result<EmailResetResult>> EmailUpdateAsync(int userId, string oldEmail, string unConfirmedEmail);
     Task<Result> EmailUpdateConfirmAsync(int userId, string token);
-    Task<Result> DeleteUserByIdAsync(int userId);
+    Task<Result<bool>> DeleteUserByIdAsync(int userId);
     Task<Result<bool>> IsInRoleAsync(int userId, string role);
 }

@@ -15,8 +15,11 @@ public class DomainToResponseProfile : Profile
         CreateMap<RegisterResult, RegisterResponse>();
         CreateMap<RegisterResult, RegisterResponse>();
 
-        CreateMap<IEnumerable<string>, IEnumerable<ErrorModelResponse>>()
-            .ConvertUsing((IEnumerable<string> a) =>
+        CreateMap<List<string>, IEnumerable<ErrorModelResponse>>()
+            .ConvertUsing((List<string> a) =>
                 a.Select((string b) => new ErrorModelResponse() { Message = b }));
+
+        CreateMap<AuthResult, AuthResponse>();
+        CreateMap<PasswordResetByAdminResult, PasswordResetByAdminResponse>();
     }
 }

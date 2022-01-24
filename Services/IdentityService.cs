@@ -73,7 +73,7 @@ public class IdentityService : IIdentityService
         {
             return new Result<RegisterResult>()
             {
-                Errors = new[] { "User with this email address already exists" }
+                Errors = new List<string> { "User with this email address already exists" }
             };
         }
 
@@ -90,8 +90,9 @@ public class IdentityService : IIdentityService
         {
             return new Result<RegisterResult>()
             {
-                Errors = identityResult_userCreation.Errors.Select(a => a.Description)
+                Errors = identityResult_userCreation.Errors.Select(a => a.Description).ToList()
             };
+
         }
 
         _log.Information("User created a new account with password.");
@@ -111,34 +112,35 @@ public class IdentityService : IIdentityService
                                + "&Token="
                                + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
 
-        return new Result<RegisterResult>
+        return new Result<RegisterResult>()
         {
+            Success = true,
             Data = new RegisterResult() { Description = "Started registration, email sent." }
         };
     }
 
-    public async Task<AuthenticationResult> RegisterConfirmAsync(int userId, string token)
+    public async Task<Result<AuthResult>> RegisterConfirmAsync(int userId, string token)
     {
         var user = await _userService.GetUserByIdAsync(userId);
         if (user == null)
         {
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "User not found." } };
+            return new Result<AuthResult>() { Errors = new() { "User not found." } };
         }
 
         if (user.EmailConfirmed)
         {
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "Users email already confirmed." } };
+            return new Result<AuthResult>() { Errors = new() { "Users email already confirmed." } };
         }
         if (user.EmailConfirmationToken == null || user.EmailConfirmationToken != token)
         {
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "EmailConfirmationToken not valid." } };
+            return new Result<AuthResult>() { Errors = new() { "EmailConfirmationToken not valid." } };
         }
         if (user.EmailConfirmationTokenValidTo < _dateTimeService.Now)
         {
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "EmailConfirmationToken expired." } };
+            return new Result<AuthResult>() { Errors = new() { "EmailConfirmationToken expired." } };
         }
         var identityResult_confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
         if (!identityResult_confirmEmail.Succeeded)
@@ -146,7 +148,7 @@ public class IdentityService : IIdentityService
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new AuthenticationResult() { Success = false, Errors = identityResult_confirmEmail.Errors.Select(a => a.Description) };
+            return new Result<AuthResult>() { Errors = identityResult_confirmEmail.Errors.Select(a => a.Description).ToList() };
         }
 
         user.EmailConfirmationToken = null;
@@ -156,14 +158,14 @@ public class IdentityService : IIdentityService
         return await CreateToken(user);
     }
 
-    public async Task<AuthenticationResult> LoginAsync(string username, string password)
+    public async Task<Result<AuthResult>> LoginAsync(string username, string password)
     {
 
         var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == username);
 
         if (user == null)
         {
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "Check your credentials." } };
+            return new Result<AuthResult>() { Errors = new() { "Check your credentials." } };
         }
         var signInResult = await _signInManager.CheckPasswordSignInAsync(user, password, true);
         if (signInResult.IsLockedOut)
@@ -171,23 +173,23 @@ public class IdentityService : IIdentityService
             // https://stackoverflow.com/a/66043460/11244995
             // https://stackoverflow.com/questions/22652118/disable-user-in-aspnet-identity-2-0
             // UserManager.IsLockedOutAsync(user.Id)
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "User is locked." } };
+            return new Result<AuthResult>() { Errors = new() { "User is locked." } };
         }
 
         if (!signInResult.Succeeded)
         {
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "SignIn: unknown error." } };
+            return new Result<AuthResult>() { Errors = new() { "SignIn: unknown error." } };
         }
 
         return await CreateToken(user);
     }
 
-    public async Task<AuthenticationResult> RefreshTokenAsync(string accesstoken, string refreshToken)
+    public async Task<Result<AuthResult>> RefreshTokenAsync(string accesstoken, string refreshToken)
     {
         var claimsPrincipal = GetPrincipalFromToken(accesstoken);
         if (claimsPrincipal == null)
         {
-            return new AuthenticationResult { Success = false, Errors = new[] { "JWT not valid." } };
+            return new Result<AuthResult> { Errors = new() { "JWT not valid." } };
         }
 
         var expiryDateUnix = long.Parse(claimsPrincipal.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
@@ -196,7 +198,7 @@ public class IdentityService : IIdentityService
 
         if (expiryDateTimeUtc > _dateTimeService.Now)
         {
-            return new AuthenticationResult { Errors = new[] { "Der JWT ist noch nicht abgelaufen." } };
+            return new Result<AuthResult> { Errors = new() { "Der JWT ist noch nicht abgelaufen." } };
         }
 
         var jti = claimsPrincipal.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
@@ -206,27 +208,27 @@ public class IdentityService : IIdentityService
 
         if (storedRefreshToken == null)
         {
-            return new AuthenticationResult { Errors = new[] { "Refreshtoken not existing." } };
+            return new Result<AuthResult> { Errors = new() { "Refreshtoken not existing." } };
         }
 
         if (_dateTimeService.Now > storedRefreshToken.ExpirationDate)
         {
-            return new AuthenticationResult { Errors = new[] { "Refreshtoken expired." } };
+            return new Result<AuthResult> { Errors = new() { "Refreshtoken expired." } };
         }
 
         if (storedRefreshToken.Invalidated)
         {
-            return new AuthenticationResult { Errors = new[] { "Refreshtoken invalidated." } };
+            return new Result<AuthResult> { Errors = new() { "Refreshtoken invalidated." } };
         }
 
         if (storedRefreshToken.Used)
         {
-            return new AuthenticationResult { Errors = new[] { "Refreshtoken already used." } };
+            return new Result<AuthResult> { Errors = new() { "Refreshtoken already used." } };
         }
 
         if (storedRefreshToken.JwtId != jti)
         {
-            return new AuthenticationResult { Errors = new[] { "Refreshtoken is referencing another JWT" } };
+            return new Result<AuthResult> { Errors = new() { "Refreshtoken is referencing another JWT" } };
         }
 
         storedRefreshToken.Used = true;
@@ -236,22 +238,18 @@ public class IdentityService : IIdentityService
         var user = await _userService.GetUserByIdAsync(Int32.Parse(claimsPrincipal.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value));
         if (user == null)
         {
-            return new AuthenticationResult { Errors = new[] { "User of expired JWT does not exist anymore." } };
+            return new Result<AuthResult> { Errors = new() { "User of expired JWT does not exist anymore." } };
         }
 
         return await CreateToken(user);
     }
 
-    public async Task<PasswordResetResult> PasswordResetAsync(string email)
+    public async Task<Result<PasswordResetResult>> PasswordResetAsync(string email)
     {
         AppUser user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            return new PasswordResetResult
-            {
-                Success = false,
-                Errors = new string[] { "User not found." }
-            };
+            return new Result<PasswordResetResult> { Errors = new() { "User not found." } };
         }
 
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -262,11 +260,7 @@ public class IdentityService : IIdentityService
 
         if (!update_result.Succeeded)
         {
-            return new PasswordResetResult
-            {
-                Success = false,
-                Errors = update_result.Errors.Select(a => a.Description)
-            };
+            return new Result<PasswordResetResult> { Errors = update_result.Errors.Select(a => a.Description).ToList() };
         }
 
         var callbackUrl = _uriService.GetBaseUri()
@@ -276,23 +270,19 @@ public class IdentityService : IIdentityService
                                + "&Token="
                                + HttpUtility.UrlEncode(resetToken, System.Text.Encoding.UTF8);
 
-        return new PasswordResetResult()
+        return new Result<PasswordResetResult>()
         {
             Success = true,
-            CallbackUrl = callbackUrl
+            Data = new PasswordResetResult() { CallbackUrl = callbackUrl }
         };
     }
 
-    public async Task<PasswordResetByAdminResult> PasswordResetByAdminAsync(string email)
+    public async Task<Result<PasswordResetByAdminResult>> PasswordResetByAdminAsync(string email)
     {
         AppUser user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            return new PasswordResetByAdminResult
-            {
-                Success = false,
-                Errors = new string[] { "User not found." }
-            };
+            return new Result<PasswordResetByAdminResult> { Errors = new() { "User not found." } };
         }
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -303,17 +293,17 @@ public class IdentityService : IIdentityService
 
         if (!identityResult_resetPasswordByAdmin.Succeeded)
         {
-            return new PasswordResetByAdminResult { Success = false, Errors = new string[] { "Unknown error." } };
+            return new Result<PasswordResetByAdminResult> { Errors = new() { "Unknown error." } };
         }
 
         user.ResetPasswordToken = null;
         user.ResetPasswordTokenValidTo = null;
         await _userManager.UpdateAsync(user);
 
-        return new PasswordResetByAdminResult()
+        return new Result<PasswordResetByAdminResult>()
         {
             Success = true,
-            NewPassword = newPassword
+            Data = new PasswordResetByAdminResult() { NewPassword = newPassword }
         };
     }
 
@@ -323,18 +313,18 @@ public class IdentityService : IIdentityService
 
         if (user == null)
         {
-            return new Result { Success = false, Errors = new string[] { "User not found." } };
+            return new Result { Errors = new() { "User not found." } };
         }
         if (user.ResetPasswordToken == null)
         {
-            return new Result { Success = false, Errors = new string[] { "Reset password token not found." } };
+            return new Result { Errors = new() { "Reset password token not found." } };
         }
         if (user.ResetPasswordTokenValidTo < _dateTimeService.Now)
         {
             user.ResetPasswordToken = null;
             user.ResetPasswordTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result { Success = false, Errors = new string[] { "Reset password token expired." } };
+            return new Result { Success = false, Errors = new() { "Reset password token expired." } };
         }
 
         var identityResult_resetPassword = await _userManager.ResetPasswordAsync(user, token, password);
@@ -344,7 +334,7 @@ public class IdentityService : IIdentityService
             user.ResetPasswordToken = null;
             user.ResetPasswordTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result { Success = false, Errors = new string[] { "Unknown error." } };
+            return new Result { Errors = new() { "Unknown error." } };
         }
 
         return new Result() { Success = true };
@@ -355,16 +345,13 @@ public class IdentityService : IIdentityService
         var user = await _userService.GetUserByIdAsync(userId);
         if (user == null)
         {
-            return new Result { Success = false, Errors = new string[] { "User not found." } };
+            return new Result { Errors = new() { "User not found." } };
         }
+
         var identityResult_changePassword = await _userManager.ChangePasswordAsync(user, password, newPassword);
         if (!identityResult_changePassword.Succeeded)
         {
-            return new Result
-            {
-                Success = false,
-                Errors = identityResult_changePassword.Errors.Select(a => a.Description)
-            };
+            return new Result { Errors = identityResult_changePassword.Errors.Select(a => a.Description).ToList() };
         }
 
         return new Result() { Success = true };
@@ -375,49 +362,35 @@ public class IdentityService : IIdentityService
         var user = await _userService.GetUserByIdAsync(userId);
         if (user == null)
         {
-            return new Result { Success = false, Errors = new string[] { "User not found." } };
+            return new Result { Errors = new() { "User not found." } };
         }
         user.UserName = newUsername;
         var identityResult_updateUser = await _userManager.UpdateAsync(user);
         if (!identityResult_updateUser.Succeeded)
         {
-            return new Result
-            {
-                Success = false,
-                Errors = identityResult_updateUser.Errors.Select(a => a.Description)
-            };
+            return new Result { Errors = identityResult_updateUser.Errors.Select(a => a.Description).ToList() };
         }
 
         return new Result() { Success = true };
     }
 
-    public async Task<EmailResetResult> EmailUpdateAsync(int userId, string oldEmail, string unConfirmedEmail)
+    public async Task<Result<EmailResetResult>> EmailUpdateAsync(int userId, string oldEmail, string unConfirmedEmail)
     {
         var user = await _userService.GetUserByIdAsync(userId);
         if (user == null)
         {
-            return new EmailResetResult { Success = false, Errors = new string[] { "User not found." } };
+            return new Result<EmailResetResult> { Errors = new() { "User not found." } };
         }
 
         if (user.Email != oldEmail)
         {
-            return new EmailResetResult
-            {
-                Success = false,
-                Errors = new string[] {
-                "Given oldEmail does not correspond to the email the user with given userId is using."
-                }
-            };
+            return new Result<EmailResetResult> { Errors = new() { "Given oldEmail does not correspond to the email the user with given userId is using." } };
         }
 
         var userInSystem = await _userManager.FindByEmailAsync(unConfirmedEmail);
         if (userInSystem != null)
         {
-            return new EmailResetResult
-            {
-                Success = false,
-                Errors = new[] { "User with this email address already exists" }
-            };
+            return new Result<EmailResetResult> { Errors = new() { "User with this email address already exists" } };
         }
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -428,11 +401,7 @@ public class IdentityService : IIdentityService
         var identityResult_updateUser = await _userManager.UpdateAsync(user);
         if (!identityResult_updateUser.Succeeded)
         {
-            return new EmailResetResult
-            {
-                Success = false,
-                Errors = identityResult_updateUser.Errors.Select(a => a.Description)
-            };
+            return new Result<EmailResetResult> { Errors = identityResult_updateUser.Errors.Select(a => a.Description).ToList() };
         }
         var callbackUrl = _uriService.GetBaseUri()
                                + ApiRoutes.Identity.EmailUpdateConfirm
@@ -441,10 +410,10 @@ public class IdentityService : IIdentityService
                                + "&EmailConfirmationToken="
                                + HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8);
 
-        return new EmailResetResult
+        return new Result<EmailResetResult>
         {
             Success = true,
-            CallbackUrl = callbackUrl
+            Data = new EmailResetResult() { CallbackUrl = callbackUrl }
         };
     }
 
@@ -453,16 +422,16 @@ public class IdentityService : IIdentityService
         var user = await _userService.GetUserByIdAsync(userId);
         if (user == null)
         {
-            return new Result() { Success = false, Errors = new string[] { "User not found." } };
+            return new Result() { Success = false, Errors = new() { "User not found." } };
         }
 
         if (string.IsNullOrEmpty(user.UnConfirmedEmail))
         {
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "User has no newEmail stored." } };
+            return new Result() { Errors = new() { "User has no newEmail stored." } };
         }
         if (user.EmailConfirmationToken == null || user.EmailConfirmationToken != token)
         {
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "EmailConfirmationToken not valid." } };
+            return new Result() { Errors = new() { "EmailConfirmationToken not valid." } };
         }
         if (user.EmailConfirmationTokenValidTo < _dateTimeService.Now)
         {
@@ -470,7 +439,7 @@ public class IdentityService : IIdentityService
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new AuthenticationResult() { Success = false, Errors = new string[] { "EmailConfirmationToken expired." } };
+            return new Result { Errors = new() { "EmailConfirmationToken expired." } };
         }
         var identityResult_confirmNewEmail = await _userManager.ConfirmEmailAsync(user, token);
         if (!identityResult_confirmNewEmail.Succeeded)
@@ -479,7 +448,7 @@ public class IdentityService : IIdentityService
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new AuthenticationResult() { Success = false, Errors = identityResult_confirmNewEmail.Errors.Select(a => a.Description) };
+            return new Result() { Errors = identityResult_confirmNewEmail.Errors.Select(a => a.Description).ToList() };
         }
         user.Email = user.UnConfirmedEmail;
         user.UnConfirmedEmail = null;
@@ -493,7 +462,7 @@ public class IdentityService : IIdentityService
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new AuthenticationResult() { Success = false, Errors = identityResult_updateUser.Errors.Select(a => a.Description) };
+            return new Result() { Errors = identityResult_updateUser.Errors.Select(a => a.Description).ToList() };
         }
         return new Result() { Success = true };
 
@@ -530,7 +499,7 @@ public class IdentityService : IIdentityService
                    StringComparison.InvariantCultureIgnoreCase);
     }
 
-    private async Task<AuthenticationResult> CreateToken(AppUser appUser)
+    private async Task<Result<AuthResult>> CreateToken(AppUser appUser)
     {
         // https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
         //  - no pii (personal identifying information) preferable
@@ -597,30 +566,37 @@ public class IdentityService : IIdentityService
         await _dbContext.RefreshTokens.AddAsync(refreshToken);
         await _dbContext.SaveChangesAsync();
 
-        return new AuthenticationResult()
+        return new Result<AuthResult>()
         {
             Success = true,
-            AccessToken = tokenHandler.WriteToken(token),
-            RefreshToken = refreshToken.Token
+            Data = new AuthResult()
+            {
+                AccessToken = tokenHandler.WriteToken(token),
+                RefreshToken = refreshToken.Token
+            }
         };
     }
 
-    public async Task<bool> IsInRoleAsync(int userId, string role)
+    public async Task<Result<bool>> IsInRoleAsync(int userId, string role)
     {
         var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
 
-        return user != null && await _userManager.IsInRoleAsync(user, role);
+        return new Result<bool>()
+        {
+            Success = true,
+            Data = user != null && await _userManager.IsInRoleAsync(user, role)
+        };
     }
 
-    public async Task<Result> DeleteUserByIdAsync(int userId)
+    public async Task<Result<bool>> DeleteUserByIdAsync(int userId)
     {
         var user = await _userService.GetUserByIdAsync(userId);
 
         if (user == null)
-            return new Result() { Success = false };
+            return new Result<bool>() { Errors = new() { "User not found." } };
 
         _dbContext.Users.Remove(user);
         var deleted = await _dbContext.SaveChangesAsync();
-        return new Result() { Success = deleted > 0 };
+        return new Result<bool>() { Success = true, Data = deleted > 0 };
     }
 }

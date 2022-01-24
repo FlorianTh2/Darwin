@@ -4,18 +4,27 @@ public class Result
 {
     public bool Success { get; set; } = false;
 
-    public IEnumerable<string> Errors { get; set; } = new List<string>();
+    public List<string>? Errors { get; set; } = new List<string>();
+
+    public Result() { }
+    public Result(List<string> errors)
+    {
+        Errors = errors;
+    }
 }
 
 public class Result<T> : Result
 {
-    public T? Data { get; init; }
+#nullable disable
 
-    public Result() { }
+    public T Data { get; init; }
 
-    public Result(T data)
+#nullable enable
+
+    public Result() : base() { }
+
+    public Result(T data) : base()
     {
-        Success = true;
         Data = data;
     }
 }
