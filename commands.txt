@@ -35,14 +35,10 @@ docker-compose up
 https://0.0.0.0:5000/swagger/index.html
 docker-compose down
 
-
-
+vervollstaendigen
+    userservice
 kleinen mailservice bauen + integrieren in register, password reset, password update, passwordResetByAdmin,email update confirm,...
-
-passwort/username/email/... reset -> invalidate refreshtoken
-
 validation for several identityController
-
 
 dotnet new sln --name FooBar
 dotnet new console --name Foo --output Foo

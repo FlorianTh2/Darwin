@@ -9,10 +9,10 @@ public static class ApiRoutes
     public const string Base = Root + "/" + Version;
 
     // ressources
-    public const string IdentityRessource = Base + "/" + "identity";
-    public const string UserRessource = Base + "/" + "users";
-
-    public const string TestRessource = Base + "/" + "test";
+    public const string IdentityRessource = Base + "/identity";
+    public const string UserRessource = Base + "/users";
+    public const string TestRessource = Base + "/test";
+    public const string SwaggerRessource = Base + "/swagger";
 
     public static class Identity
     {

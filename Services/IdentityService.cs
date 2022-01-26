@@ -8,6 +8,7 @@ using hello_asp_identity.Domain;
 using hello_asp_identity.Domain.Enums;
 using hello_asp_identity.Domain.Results;
 using hello_asp_identity.Entities;
+using hello_asp_identity.Extensions;
 using hello_asp_identity.Options;
 using hello_asp_identity.Provider;
 using Microsoft.AspNetCore.Identity;
@@ -309,12 +310,13 @@ public class IdentityService : IIdentityService
             user.ResetPasswordToken = null;
             user.ResetPasswordTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result { Errors = new() { "Unknown error." } };
+            return identityResult_resetPassword.ToAppResult();
         }
 
         await InvalidateRefreshtokensAsync(user.Id);
 
-        return new Result() { Success = true };
+        return identityResult_resetPassword.ToAppResult();
+
     }
 
     public async Task<Result<PasswordResetByAdminResult>> PasswordResetByAdminAsync(string email)
@@ -338,15 +340,11 @@ public class IdentityService : IIdentityService
 
         user.ResetPasswordToken = null;
         user.ResetPasswordTokenValidTo = null;
-        await _userManager.UpdateAsync(user);
+        var updateResult = await _userManager.UpdateAsync(user);
 
         await InvalidateRefreshtokensAsync(user.Id);
 
-        return new Result<PasswordResetByAdminResult>()
-        {
-            Success = true,
-            Data = new PasswordResetByAdminResult() { NewPassword = newPassword }
-        };
+        return updateResult.ToApplicationResult(new PasswordResetByAdminResult() { NewPassword = newPassword });
     }
 
     public async Task<Result> PasswordUpdateAsync(int userId, string password, string newPassword)
