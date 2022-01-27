@@ -15,7 +15,7 @@ public class HomeController : AppControllerBase
 {
     public HomeController() { }
 
-    // start eventuell andere route
+    // start eventuell an anderer route
     // redirect eventuell zu anderer route
 
     [HttpGet(ApiRoutes.Base, Name = "[controller]_[action]")]
