@@ -8,12 +8,17 @@ using hello_asp_identity.Helpers;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace hello_asp_identity.Controllers.V1;
 
 public class HomeController : AppControllerBase
 {
-    public HomeController() { }
+    private readonly IStringLocalizer<typeof(HomeController)> _localizer;
+    public HomeController(IStringLocalizer<HomeController> localizer)
+    {
+        _localizer = localizer;
+    }
 
     // start eventuell an anderer route
     // redirect eventuell zu anderer route

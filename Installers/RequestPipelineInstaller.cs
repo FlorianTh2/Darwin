@@ -1,6 +1,7 @@
 using hello_asp_identity.Contracts.HealthChecks;
 using hello_asp_identity.Extensions;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 namespace hello_asp_identity.Installers;
@@ -20,6 +21,10 @@ public static class RequestPipelineInstaller
         app.UseSerilogRequestLogging();
         app.UseHealthChecks("/health", new HealthCheckOptions().SpecifyCustomResponseWriter());
         app.UseHttpsRedirection();
+
+        var options = app.Services.GetService<IOptions<RequestLocalizationOptions>>()!;
+        app.UseRequestLocalization(options.Value);
+
         app.UseStaticFiles();
         app.UseAuthentication();
         app.UseAuthorization();

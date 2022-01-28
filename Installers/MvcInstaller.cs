@@ -15,7 +15,8 @@ public static class MvcInstaller
         .AddFluentValidation(options =>
         {
             options.RegisterValidatorsFromAssemblyContaining<Program>();
-        });
+        })
+        .AddDataAnnotationsLocalization();
 
         services.AddHealthChecks()
             .AddDbContextCheck<AppDbContext>();
