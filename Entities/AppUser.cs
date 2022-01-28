@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace hello_asp_identity.Entities;
 
-public class AppUser : IdentityUser<int>, IEntity<int>
+public class AppUser : IdentityUser<Guid>, IEntity<Guid>
 {
     public DateTime DOB { get; set; }
     public string? EmailConfirmationToken { get; set; }

@@ -11,10 +11,10 @@ public interface IUserService
         PaginationFilter paginationFilter
     );
 
-    Task<Result<AppUser>> GetUserByIdAsync(int userId);
+    Task<Result<AppUser>> GetUserByIdAsync(Guid userId);
 
     // update only non-identity user fields (atm: dob)
     Task<Result<bool>> UpdateUserAsync(AppUser userToUpdate);
 
-    Task<Result<bool>> UserOwnsUserAsync(int userId, string userIdRequestAuthor);
+    Task<Result<bool>> UserOwnsUserAsync(Guid userId, string userIdRequestAuthor);
 }

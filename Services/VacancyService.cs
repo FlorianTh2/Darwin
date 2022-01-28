@@ -5,7 +5,7 @@
 
 // namespace hello_asp_identity.Services;
 
-// public class Vacancy : BaseEntity<int>
+// public class Vacancy : BaseEntity<Guid>
 // {
 //     public string Title { get; set; }
 // }
@@ -19,11 +19,11 @@
 //         PaginationFilter paginationFilter
 //     );
 
-//     Task<AppUser?> GetVacancyByIdAsync(int vacancyId);
+//     Task<AppUser?> GetVacancyByIdAsync(Guid vacancyId);
 
 //     Task<bool> UpdateVacancyAsync(Vacancy vacancyToUpdate);
 
-//     Task<bool> DeleteVacancyByIdAsync(int vacancyId);
+//     Task<bool> DeleteVacancyByIdAsync(Guid vacancyId);
 // }
 
 // public class VacancyService : IVacancyService
@@ -65,7 +65,7 @@
 //         return serviceResponse;
 //     }
 
-//     public async Task<AppUser?> GetUserByIdAsync(int userId)
+//     public async Task<AppUser?> GetUserByIdAsync(Guid userId)
 //     {
 //         return await _dbContext.Vacancy
 //             .AsNoTracking()
@@ -81,7 +81,7 @@
 //         return updated > 0;
 //     }
 
-//     public async Task<bool> DeleteVacancyByIdAsync(int vacancyId)
+//     public async Task<bool> DeleteVacancyByIdAsync(Guid vacancyId)
 //     {
 //         var vacancy = await GetVacancyByIdAsync(vacancyId);
 

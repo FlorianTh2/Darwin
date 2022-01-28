@@ -68,7 +68,7 @@ public class UserController : AppControllerBase
     }
 
     [HttpGet(ApiRoutes.User.Get, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<UserResponse>>> Get([FromRoute] int userId)
+    public async Task<ActionResult<Response<UserResponse>>> Get([FromRoute] Guid userId)
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
@@ -93,7 +93,7 @@ public class UserController : AppControllerBase
 
     [HttpPut(ApiRoutes.User.Update, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<UserResponse>>> Update(
-        [FromRoute] int userId,
+        [FromRoute] Guid userId,
         [FromBody] UserUpdateRequest request
     )
     {

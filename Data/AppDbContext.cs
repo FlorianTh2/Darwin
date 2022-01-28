@@ -11,12 +11,12 @@ namespace hello_asp_identity.Data;
 public class AppDbContext : IdentityDbContext<
     AppUser,
     AppRole,
-    int,
-    IdentityUserClaim<int>,
+    Guid,
+    IdentityUserClaim<Guid>,
     AppUserRole,
-    IdentityUserLogin<int>,
-    IdentityRoleClaim<int>,
-    IdentityUserToken<int>
+    IdentityUserLogin<Guid>,
+    IdentityRoleClaim<Guid>,
+    IdentityUserToken<Guid>
     >
 {
     public const string DEFAULT_SCHEMA = "dbo";
@@ -42,9 +42,9 @@ public class AppDbContext : IdentityDbContext<
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        foreach (var entry in ChangeTracker.Entries<IEntity<int>>())
+        foreach (var entry in ChangeTracker.Entries<IEntity<Guid>>())
         {
             switch (entry.State)
             {

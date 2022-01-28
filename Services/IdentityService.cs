@@ -122,7 +122,7 @@ public class IdentityService : IIdentityService
         };
     }
 
-    public async Task<Result<AuthResult>> RegisterConfirmAsync(int userId, string token)
+    public async Task<Result<AuthResult>> RegisterConfirmAsync(Guid userId, string token)
     {
         var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
@@ -283,7 +283,7 @@ public class IdentityService : IIdentityService
         };
     }
 
-    public async Task<Result> PasswordResetConfirmAsync(int userId, string token, string password)
+    public async Task<Result> PasswordResetConfirmAsync(Guid userId, string token, string password)
     {
         var user = (await _userService.GetUserByIdAsync(userId)).Data;
 
@@ -347,7 +347,7 @@ public class IdentityService : IIdentityService
         return updateResult.ToApplicationResult(new PasswordResetByAdminResult() { NewPassword = newPassword });
     }
 
-    public async Task<Result> PasswordUpdateAsync(int userId, string password, string newPassword)
+    public async Task<Result> PasswordUpdateAsync(Guid userId, string password, string newPassword)
     {
         var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
@@ -366,7 +366,7 @@ public class IdentityService : IIdentityService
         return new Result() { Success = true };
     }
 
-    public async Task<Result> UsernameUpdateAsync(int userId, string newUsername)
+    public async Task<Result> UsernameUpdateAsync(Guid userId, string newUsername)
     {
         var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
@@ -385,7 +385,7 @@ public class IdentityService : IIdentityService
         return new Result() { Success = true };
     }
 
-    public async Task<Result<EmailResetResult>> EmailUpdateAsync(int userId, string oldEmail, string unConfirmedEmail)
+    public async Task<Result<EmailResetResult>> EmailUpdateAsync(Guid userId, string oldEmail, string unConfirmedEmail)
     {
         var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
@@ -430,7 +430,7 @@ public class IdentityService : IIdentityService
         };
     }
 
-    public async Task<Result> EmailUpdateConfirmAsync(int userId, string token)
+    public async Task<Result> EmailUpdateConfirmAsync(Guid userId, string token)
     {
         var user = (await _userService.GetUserByIdAsync(userId)).Data;
         if (user == null)
@@ -593,7 +593,7 @@ public class IdentityService : IIdentityService
         };
     }
 
-    public async Task<Result<bool>> IsInRoleAsync(int userId, string role)
+    public async Task<Result<bool>> IsInRoleAsync(Guid userId, string role)
     {
         var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
 
@@ -604,7 +604,7 @@ public class IdentityService : IIdentityService
         };
     }
 
-    public async Task<Result<bool>> DeleteUserByIdAsync(int userId)
+    public async Task<Result<bool>> DeleteUserByIdAsync(Guid userId)
     {
         var user = (await _userService.GetUserByIdAsync(userId)).Data;
 
@@ -618,7 +618,7 @@ public class IdentityService : IIdentityService
         return new Result<bool>() { Success = true, Data = deleted > 0 };
     }
 
-    public async Task<Result> InvalidateRefreshtokensAsync(int userId)
+    public async Task<Result> InvalidateRefreshtokensAsync(Guid userId)
     {
         // currently only invalidating refreshToken so that
         // currently valid jwt cannot be extended with its attached refreshToken

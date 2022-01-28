@@ -175,7 +175,7 @@ public class IdentityController : AppControllerBase
     }
 
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<PasswordUpdateResponse>>> PasswordUpdate([FromRoute] int userId, [FromBody] IdentityPasswordUpdateRequest request)
+    public async Task<ActionResult<Response<PasswordUpdateResponse>>> PasswordUpdate([FromRoute] Guid userId, [FromBody] IdentityPasswordUpdateRequest request)
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
@@ -201,7 +201,7 @@ public class IdentityController : AppControllerBase
     }
 
     [HttpPut(ApiRoutes.Identity.UsernameUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<UsernameUpdateResponse>>> UsernameUpdate([FromRoute] int userId, [FromBody] IdentityUsernameUpdateRequest request)
+    public async Task<ActionResult<Response<UsernameUpdateResponse>>> UsernameUpdate([FromRoute] Guid userId, [FromBody] IdentityUsernameUpdateRequest request)
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
@@ -227,7 +227,7 @@ public class IdentityController : AppControllerBase
     }
 
     [HttpPut(ApiRoutes.Identity.EmailUpdate, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<EmailUpdateResponse>>> EmailUpdate([FromRoute] int userId, [FromBody] IdentityEmailUpdateRequest request)
+    public async Task<ActionResult<Response<EmailUpdateResponse>>> EmailUpdate([FromRoute] Guid userId, [FromBody] IdentityEmailUpdateRequest request)
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
@@ -274,7 +274,7 @@ public class IdentityController : AppControllerBase
     }
 
     [HttpDelete(ApiRoutes.User.Delete, Name = "[controller]_[action]")]
-    public async Task<IActionResult> Delete([FromRoute] int userId)
+    public async Task<IActionResult> Delete([FromRoute] Guid userId)
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 

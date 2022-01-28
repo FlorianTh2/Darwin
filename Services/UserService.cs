@@ -51,7 +51,7 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<Result<AppUser>> GetUserByIdAsync(int userId)
+    public async Task<Result<AppUser>> GetUserByIdAsync(Guid userId)
     {
         var data = await _dbContext.Users
             .AsNoTracking()
@@ -93,7 +93,7 @@ public class UserService : IUserService
         return queryable;
     }
 
-    public async Task<Result<bool>> UserOwnsUserAsync(int userId, string userIdRequestAuthor)
+    public async Task<Result<bool>> UserOwnsUserAsync(Guid userId, string userIdRequestAuthor)
     {
         var user = await _dbContext
             .Users
