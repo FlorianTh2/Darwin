@@ -15,11 +15,8 @@ public class Result
 
 public class Result<T> : Result
 {
-#nullable disable
 
-    public T Data { get; init; }
-
-#nullable enable
+    public T Data { get; init; } = default!;
 
     public Result() : base() { }
 
