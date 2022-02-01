@@ -14,11 +14,7 @@ namespace hello_asp_identity.Controllers.V1;
 
 public class HomeController : AppControllerBase
 {
-    private readonly IStringLocalizer<typeof(HomeController)> _localizer;
-    public HomeController(IStringLocalizer<HomeController> localizer)
-    {
-        _localizer = localizer;
-    }
+    public HomeController() { }
 
     // start eventuell an anderer route
     // redirect eventuell zu anderer route

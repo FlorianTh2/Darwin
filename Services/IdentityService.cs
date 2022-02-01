@@ -239,7 +239,7 @@ public class IdentityService : IIdentityService
         await _dbContext.SaveChangesAsync();
 
         var userServiceResponse = await _userService.GetUserByIdAsync(
-            Int32.Parse(claimsPrincipal.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value)
+            Guid.Parse(claimsPrincipal.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value)
         );
         var user = userServiceResponse.Data;
         if (user == null)
@@ -295,6 +295,10 @@ public class IdentityService : IIdentityService
         {
             return new Result { Errors = new() { "Reset password token not found." } };
         }
+        if (user.ResetPasswordToken == token)
+        {
+            return new Result { Errors = new() { "Given reset password token does not match the stored reset password token." } };
+        }
         if (user.ResetPasswordTokenValidTo < _dateTimeService.Now)
         {
             user.ResetPasswordToken = null;
@@ -305,17 +309,18 @@ public class IdentityService : IIdentityService
 
         var identityResult_resetPassword = await _userManager.ResetPasswordAsync(user, token, password);
 
-        if (!identityResult_resetPassword.Succeeded && user.ResetPasswordToken == token)
+        if (!identityResult_resetPassword.Succeeded)
         {
             user.ResetPasswordToken = null;
             user.ResetPasswordTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return identityResult_resetPassword.ToAppResult();
+            return new Result { Success = false, Errors = new() { "Unknown server error." } };
         }
 
         await InvalidateRefreshtokensAsync(user.Id);
 
-        return identityResult_resetPassword.ToAppResult();
+        // return identityResult_resetPassword.ToAppResult();
+        return new Result() { Success = true };
 
     }
 
@@ -344,7 +349,8 @@ public class IdentityService : IIdentityService
 
         await InvalidateRefreshtokensAsync(user.Id);
 
-        return updateResult.ToApplicationResult(new PasswordResetByAdminResult() { NewPassword = newPassword });
+        return new Result<PasswordResetByAdminResult> { Success = true, Data = new PasswordResetByAdminResult { NewPassword = newPassword } };
+
     }
 
     public async Task<Result> PasswordUpdateAsync(Guid userId, string password, string newPassword)

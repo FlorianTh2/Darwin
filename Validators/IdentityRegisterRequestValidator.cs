@@ -20,7 +20,7 @@ public class IdentityRegisterRequestValidator : AbstractValidator<IdentityRegist
         _accountSecruityOptions = accountSecruityOptions.Value;
         _dateTimeService = dateTimeService;
 
-        RuleFor(a => a.UserName)
+        RuleFor(a => a.Username)
             .NotEmpty()
             .WithMessage("username_required");
 
