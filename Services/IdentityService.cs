@@ -86,14 +86,7 @@ public class IdentityService : IIdentityService
 
         if (!identityResult_userCreation.Succeeded)
         {
-            return new Result<RegisterResult>()
-            {
-                Errors = identityResult_userCreation.Errors.Select(a => a.Description).ToList()
-            };
-            // return Result.Fail<RegisterResult>(new UserAlreadyExistsException("User with following email address already exists: " + email));
-
-            return Result.Fail<RegisterResult>(new AlreadyExistsError(nameof(AppUser), email));
-
+            return Result.Fail<RegisterResult>(new InternalIdentityError(identityResult_userCreation.Errors));
         }
 
         _log.Information("User created a new account with password.");
@@ -116,35 +109,31 @@ public class IdentityService : IIdentityService
                 {"Token", HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8)}
             });
 
-        return new Result<RegisterResult>()
-        {
-            Success = true,
-            Data = new RegisterResult() { CallbackUrl = callbackUrl.OriginalString }
-        };
+        return Result.Ok<RegisterResult>(new RegisterResult() { CallbackUrl = callbackUrl.OriginalString });
     }
 
     public async Task<Result<AuthResult>> RegisterConfirmAsync(Guid userId, string token)
     {
-        var user = (await _userService.GetUserByIdAsync(userId)).Data;
+        var user = (await _userService.GetUserByIdAsync(userId)).Value;
         if (user == null)
         {
-            return new Result<AuthResult>() { Errors = new() { "User not found." } };
+            return Result.Fail<AuthResult>(new NotFoundError(nameof(AppUser), userId));
         }
 
         if (user.EmailConfirmed)
         {
-            return new Result<AuthResult>() { Errors = new() { "Users email already confirmed." } };
+            return Result.Fail<AuthResult>(new AlreadyConfirmedError(nameof(AppUser), userId));
         }
         if (user.EmailConfirmationToken == null || user.EmailConfirmationToken != token)
         {
-            return new Result<AuthResult>() { Errors = new() { "EmailConfirmationToken not valid." } };
+            return Result.Fail<AuthResult>(new InvalidInputError(nameof(token), token));
         }
         if (user.EmailConfirmationTokenValidTo < _dateTimeService.Now)
         {
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result<AuthResult>() { Errors = new() { "EmailConfirmationToken expired." } };
+            return Result.Fail<AuthResult>(new ExpiredInputError(nameof(token), token));
         }
         var identityResult_confirmEmail = await _userManager.ConfirmEmailAsync(user, token);
         if (!identityResult_confirmEmail.Succeeded)
@@ -152,7 +141,7 @@ public class IdentityService : IIdentityService
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result<AuthResult>() { Errors = identityResult_confirmEmail.Errors.Select(a => a.Description).ToList() };
+            return Result.Fail<AuthResult>(new InternalIdentityError(identityResult_confirmEmail.Errors));
         }
 
         user.EmailConfirmationToken = null;
@@ -169,7 +158,7 @@ public class IdentityService : IIdentityService
 
         if (user == null)
         {
-            return new Result<AuthResult>() { Errors = new() { "Check your credentials." } };
+            return Result.Fail<AuthResult>(new NotFoundError(nameof(AppUser), username));
         }
         var signInResult = await _signInManager.CheckPasswordSignInAsync(user, password, true);
         if (signInResult.IsLockedOut)
