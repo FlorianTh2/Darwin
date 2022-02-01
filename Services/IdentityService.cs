@@ -6,6 +6,7 @@ using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
 using hello_asp_identity.Domain.Enums;
+using hello_asp_identity.Domain.Errors;
 using hello_asp_identity.Domain.Results;
 using hello_asp_identity.Entities;
 using hello_asp_identity.Extensions;
@@ -71,10 +72,7 @@ public class IdentityService : IIdentityService
 
         if (userInSystem != null)
         {
-            return new Result<RegisterResult>()
-            {
-                Errors = new List<string> { "User with this email address already exists" }
-            };
+            return Result.Fail<RegisterResult>(new AlreadyExistsError(nameof(AppUser), email));
         }
 
         var user = new AppUser()
@@ -92,6 +90,9 @@ public class IdentityService : IIdentityService
             {
                 Errors = identityResult_userCreation.Errors.Select(a => a.Description).ToList()
             };
+            // return Result.Fail<RegisterResult>(new UserAlreadyExistsException("User with following email address already exists: " + email));
+
+            return Result.Fail<RegisterResult>(new AlreadyExistsError(nameof(AppUser), email));
 
         }
 
