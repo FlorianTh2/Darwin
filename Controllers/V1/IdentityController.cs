@@ -4,6 +4,7 @@ using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Contracts.V1.Responses;
 using hello_asp_identity.Domain.Enums;
+using hello_asp_identity.Domain.Errors;
 using hello_asp_identity.Extensions;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -50,15 +51,19 @@ public class IdentityController : AppControllerBase
             request.DOB.FromIso8601StringToDateTime()
         );
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
+            if (serviceResponse.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
             ));
         }
 
         return Ok(new Response<RegisterResponse>(
-            _mapper.Map<RegisterResponse>(serviceResponse.Data)
+            _mapper.Map<RegisterResponse>(serviceResponse.Value)
         ));
     }
 
@@ -68,15 +73,19 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
+            if (serviceResponse.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
             ));
         }
 
         return Ok(new Response<AuthResponse>(
-            _mapper.Map<AuthResponse>(serviceResponse.Data)
+            _mapper.Map<AuthResponse>(serviceResponse.Value)
         ));
     }
 
@@ -86,15 +95,19 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.LoginAsync(request.Username, request.Password);
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
+            if (serviceResponse.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
             ));
         }
 
         return Ok(new Response<AuthResponse>(
-            _mapper.Map<AuthResponse>(serviceResponse.Data)
+            _mapper.Map<AuthResponse>(serviceResponse.Value)
         ));
     }
 
@@ -104,15 +117,19 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.RefreshTokenAsync(request.AccessToken, request.RefreshToken);
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
+            if (serviceResponse.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
             ));
         }
 
         return Ok(new Response<AuthResponse>(
-            _mapper.Map<AuthResponse>(serviceResponse.Data)
+            _mapper.Map<AuthResponse>(serviceResponse.Value)
         ));
     }
 
@@ -122,8 +139,12 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.PasswordResetAsync(request.Email);
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
+            if (serviceResponse.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
             ));
@@ -140,15 +161,19 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.PasswordResetByAdminAsync(request.Email);
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
+            if (serviceResponse.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
             ));
         }
 
         return Ok(new Response<PasswordResetByAdminResponse>(
-            _mapper.Map<PasswordResetByAdminResponse>(serviceResponse.Data)
+            _mapper.Map<PasswordResetByAdminResponse>(serviceResponse.Value)
         ));
     }
 
@@ -162,8 +187,12 @@ public class IdentityController : AppControllerBase
             request.password
         );
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
+            if (serviceResponse.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
             ));
@@ -179,7 +208,18 @@ public class IdentityController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUserResult.Data)
+        if (userOwnsUserResult.Failed())
+        {
+            if (userOwnsUserResult.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(userOwnsUserResult.Errors)
+            ));
+        }
+
+        if (userOwnsUserResult.Value == false)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
@@ -188,7 +228,7 @@ public class IdentityController : AppControllerBase
 
         var serviceResponse = await _identityService.PasswordUpdateAsync(userId, request.Password, request.NewPassword);
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
@@ -205,7 +245,18 @@ public class IdentityController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUserResult.Data)
+        if (userOwnsUserResult.Failed())
+        {
+            if (userOwnsUserResult.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(userOwnsUserResult.Errors)
+            ));
+        }
+
+        if (userOwnsUserResult.Value == false)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
@@ -214,10 +265,10 @@ public class IdentityController : AppControllerBase
 
         var serviceResponse = await _identityService.UsernameUpdateAsync(userId, request.NewUsername);
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
             ));
         }
 
@@ -231,7 +282,18 @@ public class IdentityController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUserResult.Data)
+        if (userOwnsUserResult.Failed())
+        {
+            if (userOwnsUserResult.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(userOwnsUserResult.Errors)
+            ));
+        }
+
+        if (userOwnsUserResult.Value == false)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
@@ -240,7 +302,7 @@ public class IdentityController : AppControllerBase
 
         var serviceResponse = await _identityService.EmailUpdateAsync(userId, request.OldEmail, request.UnConfirmedEmail);
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
@@ -261,10 +323,14 @@ public class IdentityController : AppControllerBase
             request.EmailConfirmationToken
         );
 
-        if (!serviceResponse.Success)
+        if (serviceResponse.Failed())
         {
+            if (serviceResponse.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
+                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
             ));
         }
 
@@ -278,18 +344,32 @@ public class IdentityController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUserResult.Data)
+        if (userOwnsUserResult.Failed())
+        {
+            if (userOwnsUserResult.GetOriginError() is NotFoundError)
+            {
+                return NotFound();
+            }
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(userOwnsUserResult.Errors)
+            ));
+        }
+
+        if (userOwnsUserResult.Value == false)
         {
             return BadRequest(new ErrorResponse<ErrorModelResponse>(
                 _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
             ));
         }
 
-        var deleted = await _identityService.DeleteUserByIdAsync(userId);
+        var deletedResult = await _identityService.DeleteUserByIdAsync(userId);
 
-        if (deleted.Success)
-            return NoContent(); // 204
-
-        return NotFound();
+        if (deletedResult.Failed())
+        {
+            return BadRequest(new ErrorResponse<ErrorModelResponse>(
+                _mapper.Map<List<ErrorModelResponse>>(deletedResult.Errors)
+            ));
+        }
+        return NoContent(); // 204
     }
 }
