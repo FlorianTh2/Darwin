@@ -29,7 +29,7 @@ public class IdentityController : AppControllerBase
         IUserService userService,
         ICurrentUserService currentUserService,
         IIdentityService identityService
-        )
+        ) : base(mapper)
     {
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
@@ -51,16 +51,7 @@ public class IdentityController : AppControllerBase
             request.DOB.FromIso8601StringToDateTime()
         );
 
-        if (serviceResponse.Failed())
-        {
-            if (serviceResponse.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<RegisterResponse>(
             _mapper.Map<RegisterResponse>(serviceResponse.Value)
@@ -73,16 +64,7 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
 
-        if (serviceResponse.Failed())
-        {
-            if (serviceResponse.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<AuthResponse>(
             _mapper.Map<AuthResponse>(serviceResponse.Value)
@@ -95,16 +77,7 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.LoginAsync(request.Username, request.Password);
 
-        if (serviceResponse.Failed())
-        {
-            if (serviceResponse.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<AuthResponse>(
             _mapper.Map<AuthResponse>(serviceResponse.Value)
@@ -117,16 +90,7 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.RefreshTokenAsync(request.AccessToken, request.RefreshToken);
 
-        if (serviceResponse.Failed())
-        {
-            if (serviceResponse.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<AuthResponse>(
             _mapper.Map<AuthResponse>(serviceResponse.Value)
@@ -139,16 +103,7 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.PasswordResetAsync(request.Email);
 
-        if (serviceResponse.Failed())
-        {
-            if (serviceResponse.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<PasswordResetResponse>(
             new PasswordResetResponse { Description = "Started reset password, email sent." }
@@ -161,16 +116,7 @@ public class IdentityController : AppControllerBase
     {
         var serviceResponse = await _identityService.PasswordResetByAdminAsync(request.Email);
 
-        if (serviceResponse.Failed())
-        {
-            if (serviceResponse.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<PasswordResetByAdminResponse>(
             _mapper.Map<PasswordResetByAdminResponse>(serviceResponse.Value)
@@ -187,16 +133,7 @@ public class IdentityController : AppControllerBase
             request.password
         );
 
-        if (serviceResponse.Failed())
-        {
-            if (serviceResponse.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<PasswordResetConfirmResponse>(
             new PasswordResetConfirmResponse { Description = "Password resetted, please login." }
@@ -208,16 +145,7 @@ public class IdentityController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (userOwnsUserResult.Failed())
-        {
-            if (userOwnsUserResult.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(userOwnsUserResult.Errors)
-            ));
-        }
+        if (userOwnsUserResult.Failed()) CreateErrorResultByErrorResponse(userOwnsUserResult);
 
         if (userOwnsUserResult.Value == false)
         {
@@ -228,12 +156,7 @@ public class IdentityController : AppControllerBase
 
         var serviceResponse = await _identityService.PasswordUpdateAsync(userId, request.Password, request.NewPassword);
 
-        if (serviceResponse.Failed())
-        {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<PasswordUpdateResponse>(
             new PasswordUpdateResponse { Description = "Password updated successfully" }
@@ -245,16 +168,7 @@ public class IdentityController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (userOwnsUserResult.Failed())
-        {
-            if (userOwnsUserResult.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(userOwnsUserResult.Errors)
-            ));
-        }
+        if (userOwnsUserResult.Failed()) CreateErrorResultByErrorResponse(userOwnsUserResult);
 
         if (userOwnsUserResult.Value == false)
         {
@@ -265,12 +179,7 @@ public class IdentityController : AppControllerBase
 
         var serviceResponse = await _identityService.UsernameUpdateAsync(userId, request.NewUsername);
 
-        if (serviceResponse.Failed())
-        {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<UsernameUpdateResponse>(
             new UsernameUpdateResponse { Description = "Username updated successfully" }
@@ -282,16 +191,7 @@ public class IdentityController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (userOwnsUserResult.Failed())
-        {
-            if (userOwnsUserResult.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(userOwnsUserResult.Errors)
-            ));
-        }
+        if (userOwnsUserResult.Failed()) CreateErrorResultByErrorResponse(userOwnsUserResult);
 
         if (userOwnsUserResult.Value == false)
         {
@@ -302,12 +202,7 @@ public class IdentityController : AppControllerBase
 
         var serviceResponse = await _identityService.EmailUpdateAsync(userId, request.OldEmail, request.UnConfirmedEmail);
 
-        if (serviceResponse.Failed())
-        {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<EmailUpdateResponse>(
             new EmailUpdateResponse { Description = "Confirmation email sent to new email address." }
@@ -323,16 +218,7 @@ public class IdentityController : AppControllerBase
             request.EmailConfirmationToken
         );
 
-        if (serviceResponse.Failed())
-        {
-            if (serviceResponse.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<EmailUpdateResponse>(
             new EmailUpdateResponse { Description = "Users email updated, pls login again." }
@@ -344,16 +230,7 @@ public class IdentityController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (userOwnsUserResult.Failed())
-        {
-            if (userOwnsUserResult.GetOriginError() is NotFoundError)
-            {
-                return NotFound();
-            }
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(userOwnsUserResult.Errors)
-            ));
-        }
+        if (userOwnsUserResult.Failed()) CreateErrorResultByErrorResponse(userOwnsUserResult);
 
         if (userOwnsUserResult.Value == false)
         {
@@ -364,12 +241,7 @@ public class IdentityController : AppControllerBase
 
         var deletedResult = await _identityService.DeleteUserByIdAsync(userId);
 
-        if (deletedResult.Failed())
-        {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(deletedResult.Errors)
-            ));
-        }
+        if (deletedResult.Failed()) CreateErrorResultByErrorResponse(deletedResult);
         return NoContent(); // 204
     }
 }

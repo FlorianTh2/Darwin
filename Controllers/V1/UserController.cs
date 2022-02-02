@@ -28,7 +28,7 @@ public class UserController : AppControllerBase
         IUriService uriService,
         IUserService userService,
         ICurrentUserService currentUserService
-    )
+    ) : base(mapper)
     {
         _httpContextAccessor = httpContextAccessor;
         _mapper = mapper;
@@ -48,21 +48,16 @@ public class UserController : AppControllerBase
 
         var serviceResponse = await _userService.GetUsersAsync(filter, paginationFilter);
 
-        if (!serviceResponse.Success)
-        {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(serviceResponse.Errors)
-            ));
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
-        var usersResponse = _mapper.Map<List<UserResponse>>(serviceResponse.Data);
+        var usersResponse = _mapper.Map<List<UserResponse>>(serviceResponse.Value);
 
         return Ok(PaginationHelper.CreatePaginatedResponse(
             _uriService,
             ApiRoutes.User.GetAll,
             paginationFilter,
             usersResponse,
-            serviceResponse.Data.TotalNumber
+            serviceResponse.Value.TotalNumber
         ));
 
     }
@@ -72,22 +67,14 @@ public class UserController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUserResult.Data)
-        {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
-            ));
-        }
+        if (userOwnsUserResult.Failed()) CreateErrorResultByErrorResponse(userOwnsUserResult);
 
         var serviceResponse = await _userService.GetUserByIdAsync(userId);
 
-        if (!serviceResponse.Success)
-        {
-            return NotFound();
-        }
+        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
 
         return Ok(new Response<UserResponse>(
-            _mapper.Map<UserResponse>(serviceResponse.Data)
+            _mapper.Map<UserResponse>(serviceResponse.Value)
         ));
     }
 
@@ -99,27 +86,20 @@ public class UserController : AppControllerBase
     {
         var userOwnsUserResult = await _userService.UserOwnsUserAsync(userId, _currentUserService.UserId!);
 
-        if (!userOwnsUserResult.Data)
-        {
-            return BadRequest(new ErrorResponse<ErrorModelResponse>(
-                _mapper.Map<List<ErrorModelResponse>>(new List<string> { "You can not access this ressource." })
-            ));
-        }
+        if (userOwnsUserResult.Failed()) CreateErrorResultByErrorResponse(userOwnsUserResult);
 
-        var userResult = (await _userService.GetUserByIdAsync(userId))!;
+        var userResult = await _userService.GetUserByIdAsync(userId);
 
+        if (userResult.Failed()) CreateErrorResultByErrorResponse(userResult);
+
+        var user = userResult.Value;
         // following properties can be updated currently:
-        userResult.Data.DOB = request.DOB.FromIso8601StringToDateTime();
+        user.DOB = request.DOB.FromIso8601StringToDateTime();
 
-        var updated = await _userService.UpdateUserAsync(userResult.Data);
+        var serviceResult = await _userService.UpdateUserAsync(user);
 
-        if (updated.Data)
-        {
-            return Ok(new Response<UserResponse>(
-                _mapper.Map<UserResponse>(userResult.Data)
-            ));
-        }
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
-        return NotFound();
+        return Ok(new Response<UserResponse>(_mapper.Map<UserResponse>(user)));
     }
 }
