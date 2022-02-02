@@ -1,3 +1,4 @@
+using hello_asp_identity.Helpers;
 using Microsoft.AspNetCore.Identity;
 
 namespace hello_asp_identity.Domain.Errors;
@@ -8,7 +9,7 @@ public class InternalIdentityError : DomainError
     public List<string> IdentityErrors { get; } = new List<string>();
 
     public InternalIdentityError(IEnumerable<IdentityError> identityErrors)
-        : base("While processing the entity following errors got emitted: [" + String.Join(", ", identityErrors + "]."))
+        : base("While processing the entity following errors got emitted: [" + IdentityHelper.IdentityErrorsToString(identityErrors) + "].")
     {
         IdentityErrors = identityErrors.Select(a => a.Description).ToList();
     }

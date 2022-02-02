@@ -2,7 +2,7 @@ namespace hello_asp_identity.Domain.Errors;
 
 public class ForbiddenAccessError : DomainError
 {
-    public ForbiddenAccessError(string message) : base(message)
-    {
-    }
+    // unauthorized = not logged in
+    // forbidden access = logged in but does not have permission
+    public ForbiddenAccessError(string message) : base(message) { }
 }

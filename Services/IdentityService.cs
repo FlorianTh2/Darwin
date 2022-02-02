@@ -167,6 +167,8 @@ public class IdentityService : IIdentityService
             // https://stackoverflow.com/questions/22652118/disable-user-in-aspnet-identity-2-0
             // UserManager.IsLockedOutAsync(user.Id)
             return new Result<AuthResult>() { Errors = new() { "User is locked." } };
+
+
         }
 
         if (!signInResult.Succeeded)
