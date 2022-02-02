@@ -19,6 +19,10 @@ public class Result
         return Errors.FirstOrDefault();
     }
 
+    public bool isSuccess() { return Success; }
+
+    public bool isFail() { return !Success; }
+
     public List<DomainError>? GetConsecutiveErrors()
     {
         return Errors.Skip(1).ToList();

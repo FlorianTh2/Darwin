@@ -72,7 +72,7 @@ public class IdentityService : IIdentityService
 
         if (userInSystem != null)
         {
-            return Result.Fail<RegisterResult>(new AlreadyExistsError(nameof(AppUser), email));
+            return Result.Fail<RegisterResult>(new AlreadyExistsError(nameof(userInSystem), email));
         }
 
         var user = new AppUser()
@@ -117,12 +117,12 @@ public class IdentityService : IIdentityService
         var user = (await _userService.GetUserByIdAsync(userId)).Value;
         if (user == null)
         {
-            return Result.Fail<AuthResult>(new NotFoundError(nameof(AppUser), userId));
+            return Result.Fail<AuthResult>(new NotFoundError(nameof(user), userId));
         }
 
         if (user.EmailConfirmed)
         {
-            return Result.Fail<AuthResult>(new AlreadyConfirmedError(nameof(AppUser), userId));
+            return Result.Fail<AuthResult>(new AlreadyConfirmedError(nameof(user), userId));
         }
         if (user.EmailConfirmationToken == null || user.EmailConfirmationToken != token)
         {
@@ -158,22 +158,22 @@ public class IdentityService : IIdentityService
 
         if (user == null)
         {
-            return Result.Fail<AuthResult>(new NotFoundError(nameof(AppUser), username));
+            return Result.Fail<AuthResult>(new NotFoundError(nameof(user), username));
         }
+
         var signInResult = await _signInManager.CheckPasswordSignInAsync(user, password, true);
+
         if (signInResult.IsLockedOut)
         {
             // https://stackoverflow.com/a/66043460/11244995
             // https://stackoverflow.com/questions/22652118/disable-user-in-aspnet-identity-2-0
             // UserManager.IsLockedOutAsync(user.Id)
-            return new Result<AuthResult>() { Errors = new() { "User is locked." } };
-
-
+            return Result.Fail<AuthResult>(new LockedOutError(nameof(user), username));
         }
 
         if (!signInResult.Succeeded)
         {
-            return new Result<AuthResult>() { Errors = new() { "SignIn: unknown error." } };
+            return Result.Fail<AuthResult>(new InternalIdentityError("SignIn: unknown error."));
         }
 
         return await CreateToken(user);
@@ -184,7 +184,7 @@ public class IdentityService : IIdentityService
         var claimsPrincipal = GetPrincipalFromToken(accesstoken);
         if (claimsPrincipal == null)
         {
-            return new Result<AuthResult> { Errors = new() { "JWT not valid." } };
+            return Result.Fail<AuthResult>(new InvalidInputError(nameof(accesstoken), accesstoken));
         }
 
         var expiryDateUnix = long.Parse(claimsPrincipal.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
@@ -193,7 +193,7 @@ public class IdentityService : IIdentityService
 
         if (expiryDateTimeUtc > _dateTimeService.Now)
         {
-            return new Result<AuthResult> { Errors = new() { "Der JWT ist noch nicht abgelaufen." } };
+            return Result.Fail<AuthResult>(new InvalidInputError("The JWT not expired yet.", nameof(accesstoken), accesstoken));
         }
 
         var jti = claimsPrincipal.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
@@ -203,27 +203,27 @@ public class IdentityService : IIdentityService
 
         if (storedRefreshToken == null)
         {
-            return new Result<AuthResult> { Errors = new() { "Refreshtoken not existing." } };
+            return Result.Fail<AuthResult>(new NotFoundError(nameof(refreshToken), refreshToken));
         }
 
         if (_dateTimeService.Now > storedRefreshToken.ExpirationDate)
         {
-            return new Result<AuthResult> { Errors = new() { "Refreshtoken expired." } };
+            return Result.Fail<AuthResult>(new ExpiredInputError(nameof(storedRefreshToken), storedRefreshToken));
         }
 
         if (storedRefreshToken.Invalidated)
         {
-            return new Result<AuthResult> { Errors = new() { "Refreshtoken invalidated." } };
+            return Result.Fail<AuthResult>(new InvalidInputError("Refreshtoken invalidated.", nameof(storedRefreshToken), storedRefreshToken));
         }
 
         if (storedRefreshToken.Used)
         {
-            return new Result<AuthResult> { Errors = new() { "Refreshtoken already used." } };
+            return Result.Fail<AuthResult>(new InvalidInputError("Refreshtoken already used.", nameof(storedRefreshToken), storedRefreshToken));
         }
 
         if (storedRefreshToken.JwtId != jti)
         {
-            return new Result<AuthResult> { Errors = new() { "Refreshtoken is referencing another JWT" } };
+            return Result.Fail<AuthResult>(new InvalidInputError("Refreshtoken is referencing another JWT", nameof(storedRefreshToken), storedRefreshToken));
         }
 
         storedRefreshToken.Used = true;
@@ -233,10 +233,10 @@ public class IdentityService : IIdentityService
         var userServiceResponse = await _userService.GetUserByIdAsync(
             Guid.Parse(claimsPrincipal.Claims.Single(x => x.Type == ClaimTypes.NameIdentifier).Value)
         );
-        var user = userServiceResponse.Data;
+        var user = userServiceResponse.Value;
         if (user == null)
         {
-            return new Result<AuthResult> { Errors = new() { "User of expired JWT does not exist anymore." } };
+            return Result.Fail<AuthResult>(new InvalidInputError("User of expired JWT does not exist anymore.", nameof(storedRefreshToken), storedRefreshToken));
         }
 
         return await CreateToken(user);
@@ -247,7 +247,8 @@ public class IdentityService : IIdentityService
         AppUser user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            return new Result<PasswordResetResult> { Errors = new() { "User not found." } };
+            return Result.Fail<PasswordResetResult>(new NotFoundError(nameof(user), email));
+
         }
 
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -258,8 +259,9 @@ public class IdentityService : IIdentityService
 
         if (!update_result.Succeeded)
         {
-            return new Result<PasswordResetResult> { Errors = update_result.Errors.Select(a => a.Description).ToList() };
+            return Result.Fail<PasswordResetResult>(new InternalIdentityError(update_result.Errors));
         }
+
         var callbackUrl = _uriService.GetUriWithParameters(
             ApiRoutes.Identity.RegisterConfirm,
             new Dictionary<string, string>
@@ -268,35 +270,31 @@ public class IdentityService : IIdentityService
                 {"Token", HttpUtility.UrlEncode(resetToken, System.Text.Encoding.UTF8)}
             });
 
-        return new Result<PasswordResetResult>()
-        {
-            Success = true,
-            Data = new PasswordResetResult() { CallbackUrl = callbackUrl.OriginalString }
-        };
+        return Result.Ok<PasswordResetResult>(new PasswordResetResult() { CallbackUrl = callbackUrl.OriginalString });
     }
 
     public async Task<Result> PasswordResetConfirmAsync(Guid userId, string token, string password)
     {
-        var user = (await _userService.GetUserByIdAsync(userId)).Data;
+        var user = (await _userService.GetUserByIdAsync(userId)).Value;
 
         if (user == null)
         {
-            return new Result { Errors = new() { "User not found." } };
+            return Result.Fail(new NotFoundError(nameof(user), userId));
         }
         if (user.ResetPasswordToken == null)
         {
-            return new Result { Errors = new() { "Reset password token not found." } };
+            return Result.Fail(new InvalidInputError("Reset password token not found.", nameof(token), token));
         }
         if (user.ResetPasswordToken == token)
         {
-            return new Result { Errors = new() { "Given reset password token does not match the stored reset password token." } };
+            return Result.Fail(new InvalidInputError("Given reset password token does not match the stored reset password token.", nameof(token), token));
         }
         if (user.ResetPasswordTokenValidTo < _dateTimeService.Now)
         {
             user.ResetPasswordToken = null;
             user.ResetPasswordTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result { Success = false, Errors = new() { "Reset password token expired." } };
+            return Result.Fail(new ExpiredInputError(nameof(token), token));
         }
 
         var identityResult_resetPassword = await _userManager.ResetPasswordAsync(user, token, password);
@@ -306,14 +304,11 @@ public class IdentityService : IIdentityService
             user.ResetPasswordToken = null;
             user.ResetPasswordTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result { Success = false, Errors = new() { "Unknown server error." } };
+            return Result.Fail(new InternalIdentityError(identityResult_resetPassword.Errors));
         }
 
         await InvalidateRefreshtokensAsync(user.Id);
-
-        // return identityResult_resetPassword.ToAppResult();
-        return new Result() { Success = true };
-
+        return Result.Ok();
     }
 
     public async Task<Result<PasswordResetByAdminResult>> PasswordResetByAdminAsync(string email)
@@ -321,7 +316,7 @@ public class IdentityService : IIdentityService
         AppUser user = await _userManager.FindByEmailAsync(email);
         if (user == null)
         {
-            return new Result<PasswordResetByAdminResult> { Errors = new() { "User not found." } };
+            return Result.Fail<PasswordResetByAdminResult>(new NotFoundError(nameof(user), email));
         }
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -332,7 +327,7 @@ public class IdentityService : IIdentityService
 
         if (!identityResult_resetPasswordByAdmin.Succeeded)
         {
-            return new Result<PasswordResetByAdminResult> { Errors = new() { "Unknown error." } };
+            return Result.Fail<PasswordResetByAdminResult>(new InternalIdentityError(identityResult_resetPasswordByAdmin.Errors));
         }
 
         user.ResetPasswordToken = null;
@@ -341,22 +336,21 @@ public class IdentityService : IIdentityService
 
         await InvalidateRefreshtokensAsync(user.Id);
 
-        return new Result<PasswordResetByAdminResult> { Success = true, Data = new PasswordResetByAdminResult { NewPassword = newPassword } };
-
+        return Result.Ok<PasswordResetByAdminResult>(new PasswordResetByAdminResult { NewPassword = newPassword });
     }
 
     public async Task<Result> PasswordUpdateAsync(Guid userId, string password, string newPassword)
     {
-        var user = (await _userService.GetUserByIdAsync(userId)).Data;
+        var user = (await _userService.GetUserByIdAsync(userId)).Value;
         if (user == null)
         {
-            return new Result { Errors = new() { "User not found." } };
+            return Result.Fail(new NotFoundError(nameof(user), userId));
         }
 
         var identityResult_changePassword = await _userManager.ChangePasswordAsync(user, password, newPassword);
         if (!identityResult_changePassword.Succeeded)
         {
-            return new Result { Errors = identityResult_changePassword.Errors.Select(a => a.Description).ToList() };
+            return Result.Fail(new InternalIdentityError(identityResult_changePassword.Errors));
         }
 
         await InvalidateRefreshtokensAsync(user.Id);
@@ -366,16 +360,17 @@ public class IdentityService : IIdentityService
 
     public async Task<Result> UsernameUpdateAsync(Guid userId, string newUsername)
     {
-        var user = (await _userService.GetUserByIdAsync(userId)).Data;
+        var user = (await _userService.GetUserByIdAsync(userId)).Value;
         if (user == null)
         {
-            return new Result { Errors = new() { "User not found." } };
+            return Result.Fail(new NotFoundError(nameof(user), userId));
         }
+
         user.UserName = newUsername;
         var identityResult_updateUser = await _userManager.UpdateAsync(user);
         if (!identityResult_updateUser.Succeeded)
         {
-            return new Result { Errors = identityResult_updateUser.Errors.Select(a => a.Description).ToList() };
+            return Result.Fail(new InternalIdentityError(identityResult_updateUser.Errors));
         }
 
         await InvalidateRefreshtokensAsync(user.Id);
