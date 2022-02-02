@@ -6,4 +6,9 @@ public static class DateTimeExtensions
     {
         return a.ToString("o");
     }
+
+    public static DateTime SetKind(this DateTime dateTime, DateTimeKind dateTimeKind)
+    {
+        return DateTime.SpecifyKind(dateTime, dateTimeKind);
+    }
 }

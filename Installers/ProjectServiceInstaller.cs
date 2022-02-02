@@ -15,6 +15,7 @@ public static class ProjectServiceInstaller
             return new UriService(absoluteUri);
         });
 
+        services.AddScoped<IUserService, UserService>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddTransient<IDateTimeService, DateTimeService>();

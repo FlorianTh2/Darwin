@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace hello_asp_identity.Data.Migrations
 {
-    public partial class AdjustedContext0 : Migration
+    public partial class AfterResultAdjustedContext1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -18,11 +18,10 @@ namespace hello_asp_identity.Data.Migrations
                 schema: "dbo",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Comment = table.Column<string>(type: "text", nullable: true),
-                    CreatorId = table.Column<string>(type: "text", nullable: true),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Comment = table.Column<string>(type: "text", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatorId = table.Column<string>(type: "text", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdaterId = table.Column<string>(type: "text", nullable: true),
                     Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -39,14 +38,16 @@ namespace hello_asp_identity.Data.Migrations
                 schema: "dbo",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DOB = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ConfirmedCode = table.Column<string>(type: "text", nullable: true),
+                    EmailConfirmationToken = table.Column<string>(type: "text", nullable: true),
+                    EmailConfirmationTokenValidTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ResetPasswordToken = table.Column<string>(type: "text", nullable: true),
+                    ResetPasswordTokenValidTo = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Suspended = table.Column<bool>(type: "boolean", nullable: false),
                     UnConfirmedEmail = table.Column<string>(type: "text", nullable: true),
-                    CreatorId = table.Column<string>(type: "text", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatorId = table.Column<string>(type: "text", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdaterId = table.Column<string>(type: "text", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -76,7 +77,7 @@ namespace hello_asp_identity.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RoleId = table.Column<int>(type: "integer", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -99,7 +100,7 @@ namespace hello_asp_identity.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ClaimType = table.Column<string>(type: "text", nullable: true),
                     ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
@@ -123,7 +124,7 @@ namespace hello_asp_identity.Data.Migrations
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -142,8 +143,8 @@ namespace hello_asp_identity.Data.Migrations
                 schema: "dbo",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "integer", nullable: false),
-                    RoleId = table.Column<int>(type: "integer", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -169,7 +170,7 @@ namespace hello_asp_identity.Data.Migrations
                 schema: "dbo",
                 columns: table => new
                 {
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     LoginProvider = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
@@ -191,15 +192,14 @@ namespace hello_asp_identity.Data.Migrations
                 schema: "dbo",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Token = table.Column<string>(type: "text", nullable: true),
-                    JwtId = table.Column<string>(type: "text", nullable: true),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Token = table.Column<string>(type: "text", nullable: false),
+                    JwtId = table.Column<string>(type: "text", nullable: false),
                     Created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Used = table.Column<bool>(type: "boolean", nullable: false),
                     Invalidated = table.Column<bool>(type: "boolean", nullable: false),
-                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<string>(type: "text", nullable: true),
                     UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

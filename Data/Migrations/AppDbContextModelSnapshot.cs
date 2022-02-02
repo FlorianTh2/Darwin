@@ -25,13 +25,12 @@ namespace hello_asp_identity.Data.Migrations
 
             modelBuilder.Entity("hello_asp_identity.Entities.AppRole", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Comment")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ConcurrencyStamp")
@@ -69,20 +68,15 @@ namespace hello_asp_identity.Data.Migrations
 
             modelBuilder.Entity("hello_asp_identity.Entities.AppUser", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<string>("ConfirmedCode")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedOn")
@@ -97,6 +91,12 @@ namespace hello_asp_identity.Data.Migrations
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<string>("EmailConfirmationToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("EmailConfirmationTokenValidTo")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
@@ -123,6 +123,12 @@ namespace hello_asp_identity.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("ResetPasswordToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("ResetPasswordTokenValidTo")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
@@ -160,11 +166,11 @@ namespace hello_asp_identity.Data.Migrations
 
             modelBuilder.Entity("hello_asp_identity.Entities.AppUserRole", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -175,11 +181,9 @@ namespace hello_asp_identity.Data.Migrations
 
             modelBuilder.Entity("hello_asp_identity.Entities.RefreshToken", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("timestamp with time zone");
@@ -197,9 +201,11 @@ namespace hello_asp_identity.Data.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("JwtId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Token")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text");
 
@@ -212,8 +218,8 @@ namespace hello_asp_identity.Data.Migrations
                     b.Property<bool>("Used")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -222,7 +228,7 @@ namespace hello_asp_identity.Data.Migrations
                     b.ToTable("RefreshToken", "dbo");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -236,8 +242,8 @@ namespace hello_asp_identity.Data.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -246,7 +252,7 @@ namespace hello_asp_identity.Data.Migrations
                     b.ToTable("AspNetRoleClaims", "dbo");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -260,8 +266,8 @@ namespace hello_asp_identity.Data.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -270,7 +276,7 @@ namespace hello_asp_identity.Data.Migrations
                     b.ToTable("AspNetUserClaims", "dbo");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -281,8 +287,8 @@ namespace hello_asp_identity.Data.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -291,10 +297,10 @@ namespace hello_asp_identity.Data.Migrations
                     b.ToTable("AspNetUserLogins", "dbo");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("text");
@@ -339,7 +345,7 @@ namespace hello_asp_identity.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.HasOne("hello_asp_identity.Entities.AppRole", null)
                         .WithMany()
@@ -348,7 +354,7 @@ namespace hello_asp_identity.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("hello_asp_identity.Entities.AppUser", null)
                         .WithMany()
@@ -357,7 +363,7 @@ namespace hello_asp_identity.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("hello_asp_identity.Entities.AppUser", null)
                         .WithMany()
@@ -366,7 +372,7 @@ namespace hello_asp_identity.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("hello_asp_identity.Entities.AppUser", null)
                         .WithMany()

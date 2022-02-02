@@ -26,6 +26,7 @@ public class AppControllerBase : ControllerBase
         _mapper = mapper;
     }
 
+    [NonAction]
     public IActionResult CreateErrorResultByErrorResponse(Result serviceResult)
     {
         if (serviceResult.GetOriginError() is NotFoundError)

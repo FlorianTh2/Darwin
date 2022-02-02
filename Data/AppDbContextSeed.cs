@@ -1,6 +1,7 @@
 using hello_asp_identity.Domain;
 using hello_asp_identity.Domain.Enums;
 using hello_asp_identity.Entities;
+using hello_asp_identity.Extensions;
 using hello_asp_identity.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,7 @@ public static class AppDbContextSeed
         {
             UserName = adminOptions.Username,
             Email = adminOptions.Email,
-            DOB = new DateTime(1970, 1, 1)
+            DOB = new DateTime(1970, 1, 1).SetKind(DateTimeKind.Utc)
         };
 
         if (userManager.Users.All(u => u.Email != administrator.Email))
