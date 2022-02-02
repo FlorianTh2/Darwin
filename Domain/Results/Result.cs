@@ -19,20 +19,25 @@ public class Result
         return Errors.FirstOrDefault();
     }
 
-    public bool isSuccess() { return Success; }
+    public bool Succeeded() { return Success; }
 
-    public bool isFail() { return !Success; }
+    public bool Failed() { return !Success; }
 
     public List<DomainError>? GetConsecutiveErrors()
     {
         return Errors.Skip(1).ToList();
     }
 
-    public Result AddConsecutiveError(DomainError error)
+    public Result AddConsecutiveError(string methodName)
     {
-        Errors.Add(error);
+        Errors.Add(new ConsecutiveError(methodName));
         return this;
     }
+
+    // public Result<U> CastToGeneric<U>()
+    // {
+    //     return new Result<U> { Success = Success, Errors = Errors };
+    // }
 
     public static Result Ok()
     {
@@ -45,6 +50,15 @@ public class Result
         {
             Success = false,
             Errors = new List<DomainError>() { error }
+        };
+    }
+
+    public static Result Fail(Result result)
+    {
+        return new Result()
+        {
+            Success = false,
+            Errors = result.Errors
         };
     }
 
@@ -63,6 +77,15 @@ public class Result
         {
             Success = false,
             Errors = new List<DomainError>() { error }
+        };
+    }
+
+    public static Result<U> Fail<U>(Result result)
+    {
+        return new Result<U>()
+        {
+            Success = false,
+            Errors = result.Errors
         };
     }
 
@@ -96,5 +119,11 @@ public class Result<T> : Result
             Success = true,
             Value = value
         };
+    }
+
+    public Result<T> AddConsecutiveError(string methodName)
+    {
+        Errors.Add(new ConsecutiveError(methodName));
+        return this;
     }
 }

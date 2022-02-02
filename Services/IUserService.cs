@@ -14,7 +14,7 @@ public interface IUserService
     Task<Result<AppUser>> GetUserByIdAsync(Guid userId);
 
     // update only non-identity user fields (atm: dob)
-    Task<Result<bool>> UpdateUserAsync(AppUser userToUpdate);
+    Task<Result> UpdateUserAsync(AppUser userToUpdate);
 
     Task<Result<bool>> UserOwnsUserAsync(Guid userId, string userIdRequestAuthor);
 }

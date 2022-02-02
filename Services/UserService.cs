@@ -1,5 +1,6 @@
 using hello_asp_identity.Data;
 using hello_asp_identity.Domain;
+using hello_asp_identity.Domain.Errors;
 using hello_asp_identity.Domain.Results;
 using hello_asp_identity.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -44,39 +45,36 @@ public class UserService : IUserService
                 .ToListAsync(),
         };
 
-        return new Result<GetAllServiceResult<AppUser>>()
-        {
-            Success = true,
-            Data = serviceResponse
-        };
+        return Result.Ok<GetAllServiceResult<AppUser>>(serviceResponse);
     }
 
     public async Task<Result<AppUser>> GetUserByIdAsync(Guid userId)
     {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(a => a.Id == userId);
+        if (user == null)
+        {
+            return Result.Fail<AppUser>(new NotFoundError(nameof(user), userId));
+        }
+
         var data = await _dbContext.Users
             .AsNoTracking()
             .Include(a => a.UserRoles)
             .ThenInclude(a => a.Role)
             .FirstOrDefaultAsync(a => a.Id == userId);
 
-        if (data == null)
-        {
-            return new Result<AppUser>();
-        }
-
-        return new Result<AppUser>()
-        {
-            Success = true,
-            Data = data
-        };
+        return Result.Ok<AppUser>(data!);
 
     }
 
-    public async Task<Result<bool>> UpdateUserAsync(AppUser userToUpdate)
+    public async Task<Result> UpdateUserAsync(AppUser userToUpdate)
     {
         _dbContext.Users.Update(userToUpdate);
         var updated = await _dbContext.SaveChangesAsync();
-        return new Result<bool>() { Success = true, Data = updated > 0 };
+        if (updated == 0)
+        {
+            return Result.Fail(new NoChangesSavedDatabaseError(nameof(userToUpdate), userToUpdate.UserName));
+        }
+        return Result.Ok();
     }
 
     private IQueryable<AppUser> AddFiltersOnQuery(
@@ -95,22 +93,14 @@ public class UserService : IUserService
 
     public async Task<Result<bool>> UserOwnsUserAsync(Guid userId, string userIdRequestAuthor)
     {
-        var user = await _dbContext
-            .Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(a => a.Id == userId);
+        var userResult = await GetUserByIdAsync(userId);
 
-        if (user == null)
+        if (userResult.Failed())
         {
-            return new Result<bool>() { Success = true, Data = false };
+            return Result.Fail<bool>(userResult).AddConsecutiveError(nameof(UserOwnsUserAsync));
         }
+        var user = userResult.Value;
 
-        if (user.Id.ToString() != userIdRequestAuthor)
-        {
-            return new Result<bool>() { Success = true, Data = false };
-        }
-
-        return new Result<bool>() { Success = true, Data = true };
-
+        return Result.Ok<bool>(user.Id.ToString() == userIdRequestAuthor);
     }
 }
