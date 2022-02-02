@@ -380,21 +380,25 @@ public class IdentityService : IIdentityService
 
     public async Task<Result<EmailResetResult>> EmailUpdateAsync(Guid userId, string oldEmail, string unConfirmedEmail)
     {
-        var user = (await _userService.GetUserByIdAsync(userId)).Data;
+        var user = (await _userService.GetUserByIdAsync(userId)).Value;
         if (user == null)
         {
-            return new Result<EmailResetResult> { Errors = new() { "User not found." } };
+            return Result.Fail<EmailResetResult>(new NotFoundError(nameof(user), userId));
         }
 
         if (user.Email != oldEmail)
         {
-            return new Result<EmailResetResult> { Errors = new() { "Given oldEmail does not correspond to the email the user with given userId is using." } };
+            return Result.Fail<EmailResetResult>(new InvalidInputError(
+                "Given oldEmail does not correspond to the email the user with given userId is using.",
+                nameof(oldEmail),
+                oldEmail
+            ));
         }
 
         var userInSystem = await _userManager.FindByEmailAsync(unConfirmedEmail);
         if (userInSystem != null)
         {
-            return new Result<EmailResetResult> { Errors = new() { "User with this email address already exists" } };
+            return Result.Fail<EmailResetResult>(new AlreadyExistsError(nameof(unConfirmedEmail), unConfirmedEmail));
         }
 
         var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -405,7 +409,7 @@ public class IdentityService : IIdentityService
         var identityResult_updateUser = await _userManager.UpdateAsync(user);
         if (!identityResult_updateUser.Succeeded)
         {
-            return new Result<EmailResetResult> { Errors = identityResult_updateUser.Errors.Select(a => a.Description).ToList() };
+            return Result.Fail<EmailResetResult>(new InternalIdentityError(identityResult_updateUser.Errors));
         }
 
         var callbackUrl = _uriService.GetUriWithParameters(
@@ -416,28 +420,28 @@ public class IdentityService : IIdentityService
                 {"EmailConfirmationToken", HttpUtility.UrlEncode(token, System.Text.Encoding.UTF8)}
             });
 
-        return new Result<EmailResetResult>
-        {
-            Success = true,
-            Data = new EmailResetResult() { CallbackUrl = callbackUrl.OriginalString }
-        };
+        return Result.Ok<EmailResetResult>(new EmailResetResult() { CallbackUrl = callbackUrl.OriginalString });
     }
 
     public async Task<Result> EmailUpdateConfirmAsync(Guid userId, string token)
     {
-        var user = (await _userService.GetUserByIdAsync(userId)).Data;
+        var user = (await _userService.GetUserByIdAsync(userId)).Value;
         if (user == null)
         {
-            return new Result() { Success = false, Errors = new() { "User not found." } };
+            return Result.Fail(new NotFoundError(nameof(user), userId));
         }
 
         if (string.IsNullOrEmpty(user.UnConfirmedEmail))
         {
-            return new Result() { Errors = new() { "User has no newEmail stored." } };
+            return Result.Fail(new InvalidInputError(
+                "There is no newEmail stored for this user which can be confirmed.",
+                nameof(user),
+                nameof(user.UnConfirmedEmail)
+            ));
         }
         if (user.EmailConfirmationToken == null || user.EmailConfirmationToken != token)
         {
-            return new Result() { Errors = new() { "EmailConfirmationToken not valid." } };
+            return Result.Fail(new InvalidInputError(nameof(token), token));
         }
         if (user.EmailConfirmationTokenValidTo < _dateTimeService.Now)
         {
@@ -445,8 +449,9 @@ public class IdentityService : IIdentityService
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result { Errors = new() { "EmailConfirmationToken expired." } };
+            return Result.Fail(new ExpiredInputError(nameof(user.EmailConfirmationToken), token));
         }
+
         var identityResult_confirmNewEmail = await _userManager.ConfirmEmailAsync(user, token);
         if (!identityResult_confirmNewEmail.Succeeded)
         {
@@ -454,7 +459,7 @@ public class IdentityService : IIdentityService
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result() { Errors = identityResult_confirmNewEmail.Errors.Select(a => a.Description).ToList() };
+            return Result.Fail(new InternalIdentityError(identityResult_confirmNewEmail.Errors));
         }
         user.Email = user.UnConfirmedEmail;
         user.UnConfirmedEmail = null;
@@ -468,13 +473,12 @@ public class IdentityService : IIdentityService
             user.EmailConfirmationToken = null;
             user.EmailConfirmationTokenValidTo = null;
             await _userManager.UpdateAsync(user);
-            return new Result() { Errors = identityResult_updateUser.Errors.Select(a => a.Description).ToList() };
+            return Result.Fail(new InternalIdentityError(identityResult_updateUser.Errors));
+
         }
 
         await InvalidateRefreshtokensAsync(user.Id);
-
-        return new Result() { Success = true };
-
+        return Result.Ok();
     }
 
     private ClaimsPrincipal? GetPrincipalFromToken(string token)
@@ -574,41 +578,35 @@ public class IdentityService : IIdentityService
 
         await _dbContext.RefreshTokens.AddAsync(refreshToken);
         await _dbContext.SaveChangesAsync();
-
-        return new Result<AuthResult>()
+        return Result.Ok<AuthResult>(new AuthResult()
         {
-            Success = true,
-            Data = new AuthResult()
-            {
-                AccessToken = tokenHandler.WriteToken(token),
-                RefreshToken = refreshToken.Token
-            }
-        };
+            AccessToken = tokenHandler.WriteToken(token),
+            RefreshToken = refreshToken.Token
+        });
     }
 
     public async Task<Result<bool>> IsInRoleAsync(Guid userId, string role)
     {
         var user = _userManager.Users.SingleOrDefault(u => u.Id == userId);
-
-        return new Result<bool>()
-        {
-            Success = true,
-            Data = user != null && await _userManager.IsInRoleAsync(user, role)
-        };
+        return Result.Ok<bool>(user != null && await _userManager.IsInRoleAsync(user, role));
     }
 
-    public async Task<Result<bool>> DeleteUserByIdAsync(Guid userId)
+    public async Task<Result> DeleteUserByIdAsync(Guid userId)
     {
-        var user = (await _userService.GetUserByIdAsync(userId)).Data;
+        var user = (await _userService.GetUserByIdAsync(userId)).Value;
 
         if (user == null)
         {
-            return new Result<bool>() { Errors = new() { "User not found." } };
+            return Result.Fail<bool>(new NotFoundError(nameof(user), userId));
         }
 
         _dbContext.Users.Remove(user);
         var deleted = await _dbContext.SaveChangesAsync();
-        return new Result<bool>() { Success = true, Data = deleted > 0 };
+        if (deleted == 0)
+        {
+            return Result.Fail(new NoChangesSavedDatabaseError(nameof(user), userId));
+        }
+        return Result.Ok();
     }
 
     public async Task<Result> InvalidateRefreshtokensAsync(Guid userId)
@@ -621,7 +619,6 @@ public class IdentityService : IIdentityService
 
         refreshTokens.ForEach(a => a.Invalidated = true);
         await _dbContext.SaveChangesAsync();
-
-        return new Result() { Success = true };
+        return Result.Ok();
     }
 }

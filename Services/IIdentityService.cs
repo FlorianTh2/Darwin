@@ -19,7 +19,7 @@ public interface IIdentityService
     Task<Result> UsernameUpdateAsync(Guid userId, string newUsername);
     Task<Result<EmailResetResult>> EmailUpdateAsync(Guid userId, string oldEmail, string unConfirmedEmail);
     Task<Result> EmailUpdateConfirmAsync(Guid userId, string token);
-    Task<Result<bool>> DeleteUserByIdAsync(Guid userId);
+    Task<Result> DeleteUserByIdAsync(Guid userId);
     Task<Result<bool>> IsInRoleAsync(Guid userId, string role);
     Task<Result> InvalidateRefreshtokensAsync(Guid userId);
 }
