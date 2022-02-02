@@ -121,7 +121,7 @@ public class Result<T> : Result
         };
     }
 
-    public Result<T> AddConsecutiveError(string methodName)
+    public new Result<T> AddConsecutiveError(string methodName)
     {
         Errors.Add(new ConsecutiveError(methodName));
         return this;

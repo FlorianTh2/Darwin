@@ -41,6 +41,6 @@ public class TestController : ControllerBase
     public async Task<ActionResult<Response<TestResponse>>> Test()
     {
         Log.Information("Processed testEndpoint");
-        return Ok(new Response<TestResponse>(new TestResponse { Description = "Test Response" }));
+        return Ok(await Task.FromResult(new Response<TestResponse>(new TestResponse { Description = "Test Response" })));
     }
 }

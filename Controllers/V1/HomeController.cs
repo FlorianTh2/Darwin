@@ -14,13 +14,13 @@ namespace hello_asp_identity.Controllers.V1;
 
 public class HomeController : AppControllerBase
 {
-    public HomeController() { }
+    public HomeController(IMapper mapper) : base(mapper) { }
 
     // start eventuell an anderer route
     // redirect eventuell zu anderer route
 
     [HttpGet(ApiRoutes.Base, Name = "[controller]_[action]")]
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
         return Redirect(ApiRoutes.SwaggerRessource);
     }
