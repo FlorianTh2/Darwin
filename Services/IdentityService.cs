@@ -66,13 +66,15 @@ public class IdentityService : IIdentityService
 
     public async Task<Result<RegisterResult>> RegisterAsync(string username, string email, string password, DateTime dob)
     {
-        var userInSystem = await _dbContext
-            .Users
-            .FirstOrDefaultAsync(a => a.UserName == username || a.Email == email);
-
-        if (userInSystem != null)
+        var userByUsernameResult = await _userService.GetUserByUsernameAsync(username);
+        if (userByUsernameResult.Succeeded())
         {
-            return Result.Fail<RegisterResult>(new AlreadyExistsError(nameof(userInSystem), email));
+            return Result.Fail<RegisterResult>(new AlreadyExistsError(nameof(userByUsernameResult), username));
+        }
+        var userByEmailResult = await _userService.GetUserByEmailAsync(email);
+        if (userByEmailResult.Succeeded())
+        {
+            return Result.Fail<RegisterResult>(new AlreadyExistsError(nameof(userByEmailResult), email));
         }
 
         var user = new AppUser()
@@ -114,11 +116,13 @@ public class IdentityService : IIdentityService
 
     public async Task<Result<AuthResult>> RegisterConfirmAsync(Guid userId, string token)
     {
-        var user = (await _userService.GetUserByIdAsync(userId)).Value;
-        if (user == null)
+        var userResult = await _userService.GetUserByIdAsync(userId);
+        if (userResult.Failed())
         {
-            return Result.Fail<AuthResult>(new NotFoundError(nameof(user), userId));
+            return Result.Fail<AuthResult>(userResult).AddConsecutiveError(nameof(RegisterConfirmAsync));
         }
+
+        var user = userResult.Value;
 
         if (user.EmailConfirmed)
         {
@@ -155,6 +159,12 @@ public class IdentityService : IIdentityService
     {
 
         var user = await _userManager.Users.FirstOrDefaultAsync(u => u.UserName == username);
+
+        var userResult = await _userService.GetUserByUsernameAsync(username);
+        if (userResult.Failed())
+        {
+            return Result.Fail<AuthResult>(userResult).AddConsecutiveError(nameof(RegisterConfirmAsync));
+        }
 
         if (user == null)
         {

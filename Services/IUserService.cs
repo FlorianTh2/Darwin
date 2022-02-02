@@ -13,6 +13,10 @@ public interface IUserService
 
     Task<Result<AppUser>> GetUserByIdAsync(Guid userId);
 
+    Task<Result<AppUser>> GetUserByEmailAsync(string email);
+
+    Task<Result<AppUser>> GetUserByUsernameAsync(string username);
+
     // update only non-identity user fields (atm: dob)
     Task<Result> UpdateUserAsync(AppUser userToUpdate);
 

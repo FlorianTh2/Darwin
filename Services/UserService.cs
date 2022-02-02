@@ -22,11 +22,7 @@ public class UserService : IUserService
         PaginationFilter paginationFilter
     )
     {
-        var queryable = _dbContext
-        .Users
-        .Include(a => a.UserRoles)
-        .ThenInclude(a => a.Role)
-        .AsQueryable();
+        var queryable = GetFullUserQuery().AsQueryable();
 
         queryable = AddFiltersOnQuery(filter, queryable);
 
@@ -50,20 +46,38 @@ public class UserService : IUserService
 
     public async Task<Result<AppUser>> GetUserByIdAsync(Guid userId)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(a => a.Id == userId);
+        var user = await GetPlainUserQuery().FirstOrDefaultAsync(a => a.Id == userId);
         if (user == null)
         {
             return Result.Fail<AppUser>(new NotFoundError(nameof(user), userId));
         }
 
-        var data = await _dbContext.Users
-            .AsNoTracking()
-            .Include(a => a.UserRoles)
-            .ThenInclude(a => a.Role)
-            .FirstOrDefaultAsync(a => a.Id == userId);
-
+        var data = await GetFullUserQuery().FirstOrDefaultAsync(a => a.Id == userId);
         return Result.Ok<AppUser>(data!);
+    }
 
+    public async Task<Result<AppUser>> GetUserByEmailAsync(string email)
+    {
+        var user = await GetPlainUserQuery().FirstOrDefaultAsync(a => a.Email == email);
+        if (user == null)
+        {
+            return Result.Fail<AppUser>(new NotFoundError(nameof(user), email));
+        }
+
+        var data = await GetFullUserQuery().FirstOrDefaultAsync(a => a.Email == email);
+        return Result.Ok<AppUser>(data!);
+    }
+
+    public async Task<Result<AppUser>> GetUserByUsernameAsync(string username)
+    {
+        var user = await GetPlainUserQuery().FirstOrDefaultAsync(a => a.UserName == username);
+        if (user == null)
+        {
+            return Result.Fail<AppUser>(new NotFoundError(nameof(user), username));
+        }
+
+        var data = await GetFullUserQuery().FirstOrDefaultAsync(a => a.UserName == username);
+        return Result.Ok<AppUser>(data!);
     }
 
     public async Task<Result> UpdateUserAsync(AppUser userToUpdate)
@@ -75,6 +89,19 @@ public class UserService : IUserService
             return Result.Fail(new NoChangesSavedDatabaseError(nameof(userToUpdate), userToUpdate.UserName));
         }
         return Result.Ok();
+    }
+
+    private IQueryable<AppUser> GetPlainUserQuery()
+    {
+        // .AsNoTracking() not possible since some methods that change user depend on this method
+        return _dbContext.Users;
+    }
+
+    private IQueryable<AppUser> GetFullUserQuery()
+    {
+        return GetPlainUserQuery()
+                .Include(a => a.UserRoles)
+                .ThenInclude(a => a.Role);
     }
 
     private IQueryable<AppUser> AddFiltersOnQuery(
