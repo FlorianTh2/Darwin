@@ -4,8 +4,9 @@ using hello_asp_identity.Contracts.V1;
 using hello_asp_identity.Contracts.V1.Requests;
 using hello_asp_identity.Contracts.V1.Responses;
 using hello_asp_identity.Domain.Enums;
-using hello_asp_identity.Domain.Errors;
+using hello_asp_identity.Domain.Results;
 using hello_asp_identity.Extensions;
+using hello_asp_identity.Helpers;
 using hello_asp_identity.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,34 +41,29 @@ public class IdentityController : AppControllerBase
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.Register, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<RegisterResponse>>> Register([FromBody] IdentityRegisterRequest request)
+    public async Task<IActionResult> Register([FromBody] IdentityRegisterRequest request)
     {
         Log.Information("Registration of: {@request}", request);
 
-        var serviceResponse = await _identityService.RegisterAsync(
+        var serviceResult = await _identityService.RegisterAsync(
             request.Username,
             request.Email,
             request.Password,
             request.DOB.FromIso8601StringToDateTime()
         );
-
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
-
-        return Ok(new Response<RegisterResponse>(
-            _mapper.Map<RegisterResponse>(serviceResponse.Value)
-        ));
+        return serviceResult.MatchResponse(_mapper);
     }
 
     [AllowAnonymous]
     [HttpGet(ApiRoutes.Identity.RegisterConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> RegisterConfirm([FromQuery] IdentityRegisterConfirmRequest request)
     {
-        var serviceResponse = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
+        var serviceResult = await _identityService.RegisterConfirmAsync(request.UserId, request.Token);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
         return Ok(new Response<AuthResponse>(
-            _mapper.Map<AuthResponse>(serviceResponse.Value)
+            _mapper.Map<AuthResponse>(serviceResult.Value)
         ));
     }
 
@@ -75,35 +71,31 @@ public class IdentityController : AppControllerBase
     [HttpPost(ApiRoutes.Identity.Login, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> Login([FromBody] IdentityLoginRequest request)
     {
-        var serviceResponse = await _identityService.LoginAsync(request.Username, request.Password);
+        var serviceResult = await _identityService.LoginAsync(request.Username, request.Password);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
-        return Ok(new Response<AuthResponse>(
-            _mapper.Map<AuthResponse>(serviceResponse.Value)
-        ));
+        return Ok(new Response<AuthResponse>(_mapper.Map<AuthResponse>(serviceResult.Value)));
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.RefreshAccessToken, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<AuthResponse>>> RefreshAccessToken([FromBody] IdentityRefreshAccessTokenRequest request)
     {
-        var serviceResponse = await _identityService.RefreshTokenAsync(request.AccessToken, request.RefreshToken);
+        var serviceResult = await _identityService.RefreshTokenAsync(request.AccessToken, request.RefreshToken);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
-        return Ok(new Response<AuthResponse>(
-            _mapper.Map<AuthResponse>(serviceResponse.Value)
-        ));
+        return Ok(new Response<AuthResponse>(_mapper.Map<AuthResponse>(serviceResult.Value)));
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.PasswordReset, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<PasswordResetResponse>>> PasswordReset([FromBody] IdentityPasswordResetRequest request)
     {
-        var serviceResponse = await _identityService.PasswordResetAsync(request.Email);
+        var serviceResult = await _identityService.PasswordResetAsync(request.Email);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
         return Ok(new Response<PasswordResetResponse>(
             new PasswordResetResponse { Description = "Started reset password, email sent." }
@@ -114,30 +106,28 @@ public class IdentityController : AppControllerBase
     [HttpPost(ApiRoutes.Identity.PasswordResetByAdmin, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<PasswordResetByAdminResponse>>> PasswordResetByAdmin([FromBody] IdentityPasswordResetByAdminRequest request)
     {
-        var serviceResponse = await _identityService.PasswordResetByAdminAsync(request.Email);
+        var serviceResult = await _identityService.PasswordResetByAdminAsync(request.Email);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
         return Ok(new Response<PasswordResetByAdminResponse>(
-            _mapper.Map<PasswordResetByAdminResponse>(serviceResponse.Value)
+            _mapper.Map<PasswordResetByAdminResponse>(serviceResult.Value)
         ));
     }
 
     [AllowAnonymous]
     [HttpPost(ApiRoutes.Identity.PasswordResetConfirm, Name = "[controller]_[action]")]
-    public async Task<ActionResult<Response<PasswordResetConfirmResponse>>> PasswordResetConfirm([FromBody] IdentityPasswordResetConfirmRequest request)
+    public async Task<IActionResult> PasswordResetConfirm([FromBody] IdentityPasswordResetConfirmRequest request)
     {
-        var serviceResponse = await _identityService.PasswordResetConfirmAsync(
+        var serviceResult = await _identityService.PasswordResetConfirmAsync(
             request.UserId,
             request.PasswordResetConfirmationToken,
             request.password
         );
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
-
-        return Ok(new Response<PasswordResetConfirmResponse>(
-            new PasswordResetConfirmResponse { Description = "Password resetted, please login." }
-        ));
+        return serviceResult.MatchResponse<PasswordResetConfirmResponse>(
+            new PasswordResetConfirmResponse { Description = "Password resetted, please login." }, _mapper
+        );
     }
 
     [HttpPut(ApiRoutes.Identity.PasswordUpdate, Name = "[controller]_[action]")]
@@ -154,9 +144,9 @@ public class IdentityController : AppControllerBase
             ));
         }
 
-        var serviceResponse = await _identityService.PasswordUpdateAsync(userId, request.Password, request.NewPassword);
+        var serviceResult = await _identityService.PasswordUpdateAsync(userId, request.Password, request.NewPassword);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
         return Ok(new Response<PasswordUpdateResponse>(
             new PasswordUpdateResponse { Description = "Password updated successfully" }
@@ -177,9 +167,9 @@ public class IdentityController : AppControllerBase
             ));
         }
 
-        var serviceResponse = await _identityService.UsernameUpdateAsync(userId, request.NewUsername);
+        var serviceResult = await _identityService.UsernameUpdateAsync(userId, request.NewUsername);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
         return Ok(new Response<UsernameUpdateResponse>(
             new UsernameUpdateResponse { Description = "Username updated successfully" }
@@ -200,9 +190,9 @@ public class IdentityController : AppControllerBase
             ));
         }
 
-        var serviceResponse = await _identityService.EmailUpdateAsync(userId, request.OldEmail, request.UnConfirmedEmail);
+        var serviceResult = await _identityService.EmailUpdateAsync(userId, request.OldEmail, request.UnConfirmedEmail);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
         return Ok(new Response<EmailUpdateResponse>(
             new EmailUpdateResponse { Description = "Confirmation email sent to new email address." }
@@ -213,12 +203,12 @@ public class IdentityController : AppControllerBase
     [HttpGet(ApiRoutes.Identity.EmailUpdateConfirm, Name = "[controller]_[action]")]
     public async Task<ActionResult<Response<EmailUpdateConfirmResponse>>> EmailUpdateConfirm([FromQuery] IdentityEmailUpdateConfirmRequest request)
     {
-        var serviceResponse = await _identityService.EmailUpdateConfirmAsync(
+        var serviceResult = await _identityService.EmailUpdateConfirmAsync(
             request.UserId,
             request.EmailConfirmationToken
         );
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
         return Ok(new Response<EmailUpdateResponse>(
             new EmailUpdateResponse { Description = "Users email updated, pls login again." }
@@ -242,6 +232,7 @@ public class IdentityController : AppControllerBase
         var deletedResult = await _identityService.DeleteUserByIdAsync(userId);
 
         if (deletedResult.Failed()) CreateErrorResultByErrorResponse(deletedResult);
+
         return NoContent(); // 204
     }
 }

@@ -46,18 +46,18 @@ public class UserController : AppControllerBase
         var paginationFilter = _mapper.Map<PaginationFilter>(paginationQuery);
         var filter = _mapper.Map<GetAllUsersFilter>(query);
 
-        var serviceResponse = await _userService.GetUsersAsync(filter, paginationFilter);
+        var serviceResult = await _userService.GetUsersAsync(filter, paginationFilter);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
-        var usersResponse = _mapper.Map<List<UserResponse>>(serviceResponse.Value);
+        var usersResponse = _mapper.Map<List<UserResponse>>(serviceResult.Value);
 
         return Ok(PaginationHelper.CreatePaginatedResponse(
             _uriService,
             ApiRoutes.User.GetAll,
             paginationFilter,
             usersResponse,
-            serviceResponse.Value.TotalNumber
+            serviceResult.Value.TotalNumber
         ));
 
     }
@@ -69,12 +69,12 @@ public class UserController : AppControllerBase
 
         if (userOwnsUserResult.Failed()) CreateErrorResultByErrorResponse(userOwnsUserResult);
 
-        var serviceResponse = await _userService.GetUserByIdAsync(userId);
+        var serviceResult = await _userService.GetUserByIdAsync(userId);
 
-        if (serviceResponse.Failed()) CreateErrorResultByErrorResponse(serviceResponse);
+        if (serviceResult.Failed()) CreateErrorResultByErrorResponse(serviceResult);
 
         return Ok(new Response<UserResponse>(
-            _mapper.Map<UserResponse>(serviceResponse.Value)
+            _mapper.Map<UserResponse>(serviceResult.Value)
         ));
     }
 

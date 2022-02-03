@@ -1,4 +1,5 @@
 using hello_asp_identity.Domain.Errors;
+using Microsoft.AspNetCore.Mvc;
 
 namespace hello_asp_identity.Domain.Results;
 
@@ -71,6 +72,11 @@ public class Result
         };
     }
 
+    public T0 Then<T0>(Func<Result, T0> func)
+    {
+        return func(this);
+    }
+
     public static Result<T> Fail<T>(DomainError error)
     {
         return new Result<T>()
@@ -103,6 +109,17 @@ public class Result<T> : Result
 
     public Result() : base() { }
 
+    public new Result<T> AddConsecutiveError(string methodName)
+    {
+        Errors.Add(new ConsecutiveError(methodName));
+        return this;
+    }
+
+    public T0 Then<T0>(Func<Result<T>, T0> func)
+    {
+        return func(this);
+    }
+
     public static implicit operator Result<T>(DomainError error)
     {
         return new Result<T>()
@@ -119,11 +136,5 @@ public class Result<T> : Result
             Success = true,
             Value = value
         };
-    }
-
-    public new Result<T> AddConsecutiveError(string methodName)
-    {
-        Errors.Add(new ConsecutiveError(methodName));
-        return this;
     }
 }

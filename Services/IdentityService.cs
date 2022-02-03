@@ -258,7 +258,6 @@ public class IdentityService : IIdentityService
         if (user == null)
         {
             return Result.Fail<PasswordResetResult>(new NotFoundError(nameof(user), email));
-
         }
 
         var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
