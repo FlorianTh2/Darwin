@@ -1,15 +1,15 @@
 using AutoMapper;
-using darwin.Contracts.V1;
-using darwin.Contracts.V1.Requests;
-using darwin.Contracts.V1.Responses;
-using darwin.Domain;
-using darwin.Extensions;
-using darwin.Helpers;
-using darwin.Services;
+using Darwin.Contracts.V1;
+using Darwin.Contracts.V1.Requests;
+using Darwin.Contracts.V1.Responses;
+using Darwin.Domain;
+using Darwin.Extensions;
+using Darwin.Helpers;
+using Darwin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace darwin.Controllers.V1;
+namespace Darwin.Controllers.V1;
 
 [Authorize]
 [ApiController]

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace darwin.Entities;
+namespace Darwin.Entities;
 
 public class AppUser : IdentityUser<Guid>, IEntity<Guid>
 {

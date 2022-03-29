@@ -1,7 +1,7 @@
-using darwin.Domain.Results;
+using Darwin.Domain.Results;
 using Microsoft.AspNetCore.Identity;
 
-namespace darwin.Extensions;
+namespace Darwin.Extensions;
 
 public static class IdentityResultExtensions
 {

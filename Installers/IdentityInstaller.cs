@@ -1,10 +1,10 @@
-using darwin.Data;
-using darwin.Entities;
-using darwin.Options;
-using darwin.Provider;
+using Darwin.Data;
+using Darwin.Entities;
+using Darwin.Options;
+using Darwin.Provider;
 using Microsoft.AspNetCore.Identity;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class IdentityInstaller
 {

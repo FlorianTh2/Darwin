@@ -1,10 +1,10 @@
-using darwin.Data;
-using darwin.Domain;
-using darwin.Options;
+using Darwin.Data;
+using Darwin.Domain;
+using Darwin.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class CreateMigrateSeedDbInstaller
 {

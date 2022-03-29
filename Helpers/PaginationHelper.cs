@@ -1,9 +1,9 @@
-using darwin.Contracts.V1.Requests;
-using darwin.Contracts.V1.Responses;
-using darwin.Domain;
-using darwin.Services;
+using Darwin.Contracts.V1.Requests;
+using Darwin.Contracts.V1.Responses;
+using Darwin.Domain;
+using Darwin.Services;
 
-namespace darwin.Helpers;
+namespace Darwin.Helpers;
 
 public class PaginationHelper
 {

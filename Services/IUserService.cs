@@ -1,8 +1,8 @@
-using darwin.Domain;
-using darwin.Domain.Results;
-using darwin.Entities;
+using Darwin.Domain;
+using Darwin.Domain.Results;
+using Darwin.Entities;
 
-namespace darwin.Services;
+namespace Darwin.Services;
 
 public interface IUserService
 {

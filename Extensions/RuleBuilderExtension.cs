@@ -1,8 +1,8 @@
 using System.Globalization;
-using darwin.Services;
+using Darwin.Services;
 using FluentValidation;
 
-namespace darwin.Extensions;
+namespace Darwin.Extensions;
 
 public static class RuleBuilderExtensions
 {

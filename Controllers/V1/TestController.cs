@@ -1,16 +1,16 @@
 using AutoMapper;
-using darwin.Contracts.V1;
-using darwin.Contracts.V1.Requests;
-using darwin.Contracts.V1.Responses;
-using darwin.Data;
-using darwin.Entities;
-using darwin.Services;
+using Darwin.Contracts.V1;
+using Darwin.Contracts.V1.Requests;
+using Darwin.Contracts.V1.Responses;
+using Darwin.Data;
+using Darwin.Entities;
+using Darwin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
-namespace darwin.Controllers.V1;
+namespace Darwin.Controllers.V1;
 
 [ApiController]
 [Produces("application/json")]

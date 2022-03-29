@@ -1,4 +1,4 @@
-using darwin.Installers;
+using Darwin.Installers;
 using Serilog;
 
 // #pragma warning disable 8625, 8603, 8618, 1998, 8601

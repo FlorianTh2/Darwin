@@ -1,7 +1,7 @@
-using darwin.Domain.Errors;
+using Darwin.Domain.Errors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace darwin.Domain.Results;
+namespace Darwin.Domain.Results;
 
 public class Result
 {

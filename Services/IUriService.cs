@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
-using darwin.Contracts.V1.Requests;
+using Darwin.Contracts.V1.Requests;
 
-namespace darwin.Services;
+namespace Darwin.Services;
 
 public interface IUriService
 {

@@ -1,11 +1,11 @@
 using System.Text;
-using darwin.Helpers;
-using darwin.Options;
-using darwin.Services;
+using Darwin.Helpers;
+using Darwin.Options;
+using Darwin.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class JwtInstaller
 {

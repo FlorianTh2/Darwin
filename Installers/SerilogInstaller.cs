@@ -1,11 +1,11 @@
-using darwin.Contracts.V1.Requests;
-using darwin.Entities;
-using darwin.Extensions;
+using Darwin.Contracts.V1.Requests;
+using Darwin.Entities;
+using Darwin.Extensions;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Formatting.Json;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 public static class SerilogInstaller
 {
     public static ReloadableLogger BootstrapSerilog()

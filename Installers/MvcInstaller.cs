@@ -1,8 +1,8 @@
-using darwin.Data;
-using darwin.Filters;
+using Darwin.Data;
+using Darwin.Filters;
 using FluentValidation.AspNetCore;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class MvcInstaller
 {

@@ -1,4 +1,4 @@
-namespace darwin.Installers;
+namespace Darwin.Installers;
 public static class CorsInstaller
 {
     public static void InstallCors(this IServiceCollection services)

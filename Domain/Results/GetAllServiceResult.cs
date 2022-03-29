@@ -1,4 +1,4 @@
-namespace darwin.Domain.Results;
+namespace Darwin.Domain.Results;
 
 public class GetAllServiceResult<T> where T : class
 {

@@ -1,7 +1,7 @@
-using darwin.Domain;
-using darwin.Domain.Results;
+using Darwin.Domain;
+using Darwin.Domain.Results;
 
-namespace darwin.Services;
+namespace Darwin.Services;
 
 public interface IIdentityService
 {

@@ -1,11 +1,11 @@
 using System.Globalization;
 using System.Reflection;
-using darwin.Extensions;
+using Darwin.Extensions;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.OpenApi.Models;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class LocalizationInstaller
 {

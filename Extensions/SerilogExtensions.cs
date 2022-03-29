@@ -1,8 +1,8 @@
-using darwin.Contracts.V1.Requests;
-using darwin.Entities;
+using Darwin.Contracts.V1.Requests;
+using Darwin.Entities;
 using Serilog;
 
-namespace darwin.Extensions;
+namespace Darwin.Extensions;
 
 public static class SerilogExtensions
 {

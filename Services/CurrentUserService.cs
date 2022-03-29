@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 
-namespace darwin.Services;
+namespace Darwin.Services;
 
 public class CurrentUserService : ICurrentUserService
 {

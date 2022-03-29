@@ -1,8 +1,8 @@
-using darwin.Contracts.V1.Responses;
+using Darwin.Contracts.V1.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace darwin.Filters;
+namespace Darwin.Filters;
 
 public class ValidationFilter : IAsyncActionFilter
 {

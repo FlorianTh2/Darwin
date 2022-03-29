@@ -1,6 +1,6 @@
-using darwin.Entities;
+using Darwin.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace darwin.Extensions;
+namespace Darwin.Extensions;
 
 public static class UserManagerExtension { }

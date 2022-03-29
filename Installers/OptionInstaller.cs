@@ -1,9 +1,9 @@
-using darwin.Helpers;
-using darwin.Options;
+using Darwin.Helpers;
+using Darwin.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class OptionInstaller
 {

@@ -1,11 +1,11 @@
 using AutoMapper;
-using darwin.Contracts.V1.Responses;
-using darwin.Domain.Errors;
-using darwin.Domain.Results;
+using Darwin.Contracts.V1.Responses;
+using Darwin.Domain.Errors;
+using Darwin.Domain.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace darwin.Controllers.V1;
+namespace Darwin.Controllers.V1;
 
 [Authorize]
 [ApiController]

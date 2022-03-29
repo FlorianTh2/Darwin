@@ -1,12 +1,12 @@
 using System.Data;
-using darwin.Contracts.V1.Requests;
-using darwin.Extensions;
-using darwin.Options;
-using darwin.Services;
+using Darwin.Contracts.V1.Requests;
+using Darwin.Extensions;
+using Darwin.Options;
+using Darwin.Services;
 using FluentValidation;
 using Microsoft.Extensions.Options;
 
-namespace darwin.Validators;
+namespace Darwin.Validators;
 
 public class IdentityRegisterRequestValidator : AbstractValidator<IdentityRegisterRequest>
 {

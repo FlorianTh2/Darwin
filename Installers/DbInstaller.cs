@@ -1,9 +1,9 @@
-using darwin.Data;
-using darwin.Options;
+using Darwin.Data;
+using Darwin.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class DbInstaller
 {

@@ -1,8 +1,8 @@
-using darwin.Entities;
+using Darwin.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace darwin.Data.EntityConfigurations;
+namespace Darwin.Data.EntityConfigurations;
 
 public class RefreshTokenEntityTypeConfiguration : IEntityTypeConfiguration<RefreshToken>
 {

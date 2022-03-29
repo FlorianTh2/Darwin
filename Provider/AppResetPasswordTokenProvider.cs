@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace darwin.Provider;
+namespace Darwin.Provider;
 
 public class AppResetPasswordTokenProvider<TUser> : DataProtectorTokenProvider<TUser> where TUser : class
 {

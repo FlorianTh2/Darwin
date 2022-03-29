@@ -1,8 +1,8 @@
 using System.Reflection;
-using darwin.Extensions;
+using Darwin.Extensions;
 using Microsoft.OpenApi.Models;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class SwaggerInstaller
 {

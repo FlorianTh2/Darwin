@@ -1,12 +1,12 @@
 using System.Reflection;
-using darwin.Data.EntityConfigurations;
-using darwin.Entities;
-using darwin.Services;
+using Darwin.Data.EntityConfigurations;
+using Darwin.Entities;
+using Darwin.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace darwin.Data;
+namespace Darwin.Data;
 
 public class AppDbContext : IdentityDbContext<
     AppUser,

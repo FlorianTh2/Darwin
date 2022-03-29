@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace darwin.Domain;
+namespace Darwin.Domain;
 
 public static class Password
 {

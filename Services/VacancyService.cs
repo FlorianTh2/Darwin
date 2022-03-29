@@ -1,9 +1,9 @@
-// using darwin.Data;
-// using darwin.Domain;
-// using darwin.Entities;
+// using Darwin.Data;
+// using Darwin.Domain;
+// using Darwin.Entities;
 // using Microsoft.EntityFrameworkCore;
 
-// namespace darwin.Services;
+// namespace Darwin.Services;
 
 // public class Vacancy : BaseEntity<Guid>
 // {

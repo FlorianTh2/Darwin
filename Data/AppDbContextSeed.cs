@@ -1,12 +1,12 @@
-using darwin.Domain;
-using darwin.Domain.Enums;
-using darwin.Entities;
-using darwin.Extensions;
-using darwin.Options;
+using Darwin.Domain;
+using Darwin.Domain.Enums;
+using Darwin.Entities;
+using Darwin.Extensions;
+using Darwin.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace darwin.Data;
+namespace Darwin.Data;
 
 public static class AppDbContextSeed
 {

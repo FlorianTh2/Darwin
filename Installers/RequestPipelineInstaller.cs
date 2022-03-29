@@ -1,10 +1,10 @@
-using darwin.Contracts.HealthChecks;
-using darwin.Extensions;
+using Darwin.Contracts.HealthChecks;
+using Darwin.Extensions;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class RequestPipelineInstaller
 {

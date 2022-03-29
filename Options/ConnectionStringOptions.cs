@@ -1,4 +1,4 @@
-namespace darwin.Options;
+namespace Darwin.Options;
 
 public class ConnectionStringOptions
 {

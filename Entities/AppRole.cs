@@ -1,7 +1,7 @@
-using darwin.Services;
+using Darwin.Services;
 using Microsoft.AspNetCore.Identity;
 
-namespace darwin.Entities;
+namespace Darwin.Entities;
 
 public class AppRole : IdentityRole<Guid>, IEntity<Guid>
 {

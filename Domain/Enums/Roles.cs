@@ -1,4 +1,4 @@
-namespace darwin.Domain.Enums;
+namespace Darwin.Domain.Enums;
 
 public enum Roles
 {

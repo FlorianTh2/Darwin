@@ -1,4 +1,4 @@
-namespace darwin.Contracts.V1;
+namespace Darwin.Contracts.V1;
 
 public static class ApiRoutes
 {

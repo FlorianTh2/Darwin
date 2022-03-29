@@ -1,4 +1,4 @@
-namespace darwin.Entities;
+namespace Darwin.Entities;
 
 public interface IEntity<T>
 {

@@ -1,8 +1,8 @@
 using AutoMapper;
-using darwin.Contracts.V1;
+using Darwin.Contracts.V1;
 using Microsoft.AspNetCore.Mvc;
 
-namespace darwin.Controllers.V1;
+namespace Darwin.Controllers.V1;
 
 public class HomeController : AppControllerBase
 {

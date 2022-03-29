@@ -2,23 +2,23 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
-using darwin.Contracts.V1;
-using darwin.Data;
-using darwin.Domain;
-using darwin.Domain.Enums;
-using darwin.Domain.Errors;
-using darwin.Domain.Results;
-using darwin.Entities;
-using darwin.Extensions;
-using darwin.Options;
-using darwin.Provider;
+using Darwin.Contracts.V1;
+using Darwin.Data;
+using Darwin.Domain;
+using Darwin.Domain.Enums;
+using Darwin.Domain.Errors;
+using Darwin.Domain.Results;
+using Darwin.Entities;
+using Darwin.Extensions;
+using Darwin.Options;
+using Darwin.Provider;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
-namespace darwin.Services;
+namespace Darwin.Services;
 
 public class IdentityService : IIdentityService
 {

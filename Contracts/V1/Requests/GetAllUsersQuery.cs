@@ -1,3 +1,3 @@
-namespace darwin.Contracts.V1.Requests;
+namespace Darwin.Contracts.V1.Requests;
 
 public record GetAllUsersQuery();

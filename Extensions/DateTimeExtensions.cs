@@ -1,4 +1,4 @@
-namespace darwin.Extensions;
+namespace Darwin.Extensions;
 
 public static class DateTimeExtensions
 {

@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace darwin.Data.Migrations
+namespace Darwin.Data.Migrations
 {
     public partial class AfterResultAdjustedContext1 : Migration
     {

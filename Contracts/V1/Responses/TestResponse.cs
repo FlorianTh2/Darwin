@@ -1,4 +1,4 @@
-namespace darwin.Contracts.V1.Responses;
+namespace Darwin.Contracts.V1.Responses;
 
 public record TestResponse
 {

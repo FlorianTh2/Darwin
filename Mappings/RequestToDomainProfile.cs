@@ -1,8 +1,8 @@
-namespace darwin.Mappings;
+namespace Darwin.Mappings;
 
 using AutoMapper;
-using darwin.Contracts.V1.Requests;
-using darwin.Domain;
+using Darwin.Contracts.V1.Requests;
+using Darwin.Domain;
 
 public class RequestToDomainProfile : Profile
 {

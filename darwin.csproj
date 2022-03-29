@@ -5,7 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>darwin</RootNamespace>
+    <RootNamespace>Darwin</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

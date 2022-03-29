@@ -1,4 +1,4 @@
-namespace darwin.Domain.Errors;
+namespace Darwin.Domain.Errors;
 
 public class LockedOutError : DomainError
 {

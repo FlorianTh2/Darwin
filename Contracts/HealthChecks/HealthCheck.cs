@@ -1,4 +1,4 @@
-namespace darwin.Contracts.HealthChecks;
+namespace Darwin.Contracts.HealthChecks;
 
 public record HealthCheck
 {

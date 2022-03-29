@@ -1,11 +1,11 @@
-using darwin.Data;
-using darwin.Domain;
-using darwin.Domain.Errors;
-using darwin.Domain.Results;
-using darwin.Entities;
+using Darwin.Data;
+using Darwin.Domain;
+using Darwin.Domain.Errors;
+using Darwin.Domain.Results;
+using Darwin.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace darwin.Services;
+namespace Darwin.Services;
 
 public class UserService : IUserService
 {

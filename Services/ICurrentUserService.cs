@@ -1,4 +1,4 @@
-namespace darwin.Services;
+namespace Darwin.Services;
 
 public interface ICurrentUserService
 {

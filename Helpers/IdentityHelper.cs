@@ -1,9 +1,9 @@
 using System.Text;
-using darwin.Options;
+using Darwin.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
-namespace darwin.Helpers;
+namespace Darwin.Helpers;
 
 public class IdentityHelper
 {

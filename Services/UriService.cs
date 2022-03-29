@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
 using System.Web;
-using darwin.Contracts.V1.Requests;
-using darwin.Services;
+using Darwin.Contracts.V1.Requests;
+using Darwin.Services;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace darwin.Services;
+namespace Darwin.Services;
 
 public class UriService : IUriService
 {

@@ -1,7 +1,7 @@
-using darwin.Contracts.HealthChecks;
+using Darwin.Contracts.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
-namespace darwin.Extensions;
+namespace Darwin.Extensions;
 
 public static class HealthCheckOptionsExtensions
 {

@@ -1,4 +1,4 @@
-namespace darwin.Domain;
+namespace Darwin.Domain;
 
 public class PaginationFilter
 {

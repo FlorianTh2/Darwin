@@ -1,18 +1,18 @@
 using AutoMapper;
-using darwin.Attributes;
-using darwin.Contracts.V1;
-using darwin.Contracts.V1.Requests;
-using darwin.Contracts.V1.Responses;
-using darwin.Domain.Enums;
-using darwin.Domain.Results;
-using darwin.Extensions;
-using darwin.Helpers;
-using darwin.Services;
+using Darwin.Attributes;
+using Darwin.Contracts.V1;
+using Darwin.Contracts.V1.Requests;
+using Darwin.Contracts.V1.Responses;
+using Darwin.Domain.Enums;
+using Darwin.Domain.Results;
+using Darwin.Extensions;
+using Darwin.Helpers;
+using Darwin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
-namespace darwin.Controllers.V1;
+namespace Darwin.Controllers.V1;
 
 public class IdentityController : AppControllerBase
 {

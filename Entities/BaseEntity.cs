@@ -1,4 +1,4 @@
-namespace darwin.Entities;
+namespace Darwin.Entities;
 
 public abstract class BaseEntity<T> : IEntity<T>
 {

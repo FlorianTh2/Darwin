@@ -1,10 +1,10 @@
-namespace darwin.Mappings;
+namespace Darwin.Mappings;
 
 using AutoMapper;
-using darwin.Contracts.V1.Responses;
-using darwin.Domain.Results;
-using darwin.Entities;
-using darwin.Extensions;
+using Darwin.Contracts.V1.Responses;
+using Darwin.Domain.Results;
+using Darwin.Entities;
+using Darwin.Extensions;
 
 public class DomainToResponseProfile : Profile
 {

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace darwin.Extensions;
+namespace Darwin.Extensions;
 
 public static class SwaggerExtensions
 {

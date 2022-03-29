@@ -1,6 +1,6 @@
-using darwin.Services;
+using Darwin.Services;
 
-namespace darwin.Installers;
+namespace Darwin.Installers;
 
 public static class ProjectServiceInstaller
 {
