@@ -1,7 +1,7 @@
 using Darwin.Installers;
 using Serilog;
 
-// #pragma warning disable 8625, 8603, 8618, 1998, 8601
+#pragma warning disable 8625, 8603, 8618, 1998, 8601
 
 Log.Logger = SerilogInstaller.BootstrapSerilog();
 Log.Information("Starting up");
