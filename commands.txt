@@ -15,16 +15,15 @@ dotnet ef database update --context AppDbContext –TargetMigration: "2021234233
 
 dotnet ef migrations remove
 
-sql management studio delete all current lettershop templates
-delete from [ZenitDb].[dbo].[LettershopTemplates]
-
+sql management studio delete all current aspnetusers
 delete from [hello-auth].[dbo].[AspNetUsers]
 
 C:\Users\Florian\AppData\Roaming\Microsoft\UserSecrets
 
 https://localhost:5001/swagger/index.html
 
-dotnet watch run
+// dotnet 6 hot reload
+dotnet watch
 
 dotnet run
 
