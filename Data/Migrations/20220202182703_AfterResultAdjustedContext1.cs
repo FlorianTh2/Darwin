@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace hello_asp_identity.Data.Migrations
+namespace darwin.Data.Migrations
 {
     public partial class AfterResultAdjustedContext1 : Migration
     {

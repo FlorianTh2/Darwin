@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Domain.Results;
+namespace darwin.Domain.Results;
 
 public class PasswordResetByAdminResult
 {

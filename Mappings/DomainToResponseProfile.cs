@@ -1,10 +1,10 @@
-namespace hello_asp_identity.Mappings;
+namespace darwin.Mappings;
 
 using AutoMapper;
-using hello_asp_identity.Contracts.V1.Responses;
-using hello_asp_identity.Domain.Results;
-using hello_asp_identity.Entities;
-using hello_asp_identity.Extensions;
+using darwin.Contracts.V1.Responses;
+using darwin.Domain.Results;
+using darwin.Entities;
+using darwin.Extensions;
 
 public class DomainToResponseProfile : Profile
 {

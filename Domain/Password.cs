@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace hello_asp_identity.Domain;
+namespace darwin.Domain;
 
 public static class Password
 {

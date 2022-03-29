@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Domain.Enums;
+namespace darwin.Domain.Enums;
 
 public enum Roles
 {

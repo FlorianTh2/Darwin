@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Contracts.V1;
+namespace darwin.Contracts.V1;
 
 public static class ApiRoutes
 {

@@ -1,9 +1,9 @@
-using hello_asp_identity.Data;
-using hello_asp_identity.Options;
+using darwin.Data;
+using darwin.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 
 public static class DbInstaller
 {

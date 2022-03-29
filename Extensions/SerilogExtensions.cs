@@ -1,8 +1,8 @@
-using hello_asp_identity.Contracts.V1.Requests;
-using hello_asp_identity.Entities;
+using darwin.Contracts.V1.Requests;
+using darwin.Entities;
 using Serilog;
 
-namespace hello_asp_identity.Extensions;
+namespace darwin.Extensions;
 
 public static class SerilogExtensions
 {

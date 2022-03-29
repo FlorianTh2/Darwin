@@ -1,6 +1,6 @@
-using hello_asp_identity.Entities;
+using darwin.Entities;
 using Microsoft.AspNetCore.Identity;
 
-namespace hello_asp_identity.Extensions;
+namespace darwin.Extensions;
 
 public static class UserManagerExtension { }

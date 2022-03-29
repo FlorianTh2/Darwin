@@ -1,14 +1,10 @@
-using System.Text;
 using AutoMapper;
-using hello_asp_identity.Contracts.V1.Responses;
-using hello_asp_identity.Domain.Errors;
-using hello_asp_identity.Domain.Results;
-using hello_asp_identity.Options;
-using Microsoft.AspNetCore.Identity;
+using darwin.Contracts.V1.Responses;
+using darwin.Domain.Errors;
+using darwin.Domain.Results;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
-namespace hello_asp_identity.Helpers;
+namespace darwin.Helpers;
 
 public class ControllerHelper
 {

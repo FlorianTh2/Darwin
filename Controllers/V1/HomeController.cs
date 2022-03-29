@@ -1,8 +1,8 @@
 using AutoMapper;
-using hello_asp_identity.Contracts.V1;
+using darwin.Contracts.V1;
 using Microsoft.AspNetCore.Mvc;
 
-namespace hello_asp_identity.Controllers.V1;
+namespace darwin.Controllers.V1;
 
 public class HomeController : AppControllerBase
 {

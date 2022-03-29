@@ -1,7 +1,7 @@
-using hello_asp_identity.Domain.Errors;
+using darwin.Domain.Errors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace hello_asp_identity.Domain.Results;
+namespace darwin.Domain.Results;
 
 public class Result
 {

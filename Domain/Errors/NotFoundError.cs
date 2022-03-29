@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Domain.Errors;
+namespace darwin.Domain.Errors;
 
 public class NotFoundError : DomainError
 {

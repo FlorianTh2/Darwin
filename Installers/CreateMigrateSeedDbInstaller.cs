@@ -1,10 +1,10 @@
-using hello_asp_identity.Data;
-using hello_asp_identity.Domain;
-using hello_asp_identity.Options;
+using darwin.Data;
+using darwin.Domain;
+using darwin.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 
 public static class CreateMigrateSeedDbInstaller
 {

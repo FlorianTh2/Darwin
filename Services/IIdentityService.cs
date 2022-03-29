@@ -1,7 +1,7 @@
-using hello_asp_identity.Domain;
-using hello_asp_identity.Domain.Results;
+using darwin.Domain;
+using darwin.Domain.Results;
 
-namespace hello_asp_identity.Services;
+namespace darwin.Services;
 
 public interface IIdentityService
 {

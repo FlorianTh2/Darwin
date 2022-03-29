@@ -1,11 +1,11 @@
 using System.Globalization;
 using System.Reflection;
-using hello_asp_identity.Extensions;
+using darwin.Extensions;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Localization.Routing;
 using Microsoft.OpenApi.Models;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 
 public static class LocalizationInstaller
 {

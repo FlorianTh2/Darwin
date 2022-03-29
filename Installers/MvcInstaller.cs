@@ -1,8 +1,8 @@
+using darwin.Data;
+using darwin.Filters;
 using FluentValidation.AspNetCore;
-using hello_asp_identity.Data;
-using hello_asp_identity.Filters;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 
 public static class MvcInstaller
 {

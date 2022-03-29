@@ -1,6 +1,6 @@
-using hello_asp_identity.Services;
+using darwin.Services;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 
 public static class ProjectServiceInstaller
 {

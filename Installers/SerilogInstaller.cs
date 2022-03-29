@@ -1,11 +1,11 @@
-using hello_asp_identity.Contracts.V1.Requests;
-using hello_asp_identity.Entities;
-using hello_asp_identity.Extensions;
+using darwin.Contracts.V1.Requests;
+using darwin.Entities;
+using darwin.Extensions;
 using Serilog;
 using Serilog.Extensions.Hosting;
 using Serilog.Formatting.Json;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 public static class SerilogInstaller
 {
     public static ReloadableLogger BootstrapSerilog()

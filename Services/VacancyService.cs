@@ -1,9 +1,9 @@
-// using hello_asp_identity.Data;
-// using hello_asp_identity.Domain;
-// using hello_asp_identity.Entities;
+// using darwin.Data;
+// using darwin.Domain;
+// using darwin.Entities;
 // using Microsoft.EntityFrameworkCore;
 
-// namespace hello_asp_identity.Services;
+// namespace darwin.Services;
 
 // public class Vacancy : BaseEntity<Guid>
 // {

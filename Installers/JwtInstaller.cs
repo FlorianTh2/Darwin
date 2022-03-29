@@ -1,11 +1,11 @@
 using System.Text;
-using hello_asp_identity.Helpers;
-using hello_asp_identity.Options;
-using hello_asp_identity.Services;
+using darwin.Helpers;
+using darwin.Options;
+using darwin.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 
 public static class JwtInstaller
 {

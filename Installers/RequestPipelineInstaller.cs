@@ -1,10 +1,10 @@
-using hello_asp_identity.Contracts.HealthChecks;
-using hello_asp_identity.Extensions;
+using darwin.Contracts.HealthChecks;
+using darwin.Extensions;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 
 public static class RequestPipelineInstaller
 {

@@ -1,7 +1,7 @@
-using hello_asp_identity.Helpers;
+using darwin.Helpers;
 using Microsoft.AspNetCore.Identity;
 
-namespace hello_asp_identity.Domain.Errors;
+namespace darwin.Domain.Errors;
 
 // class to handle asp.net identity errors
 public class InternalIdentityError : DomainError

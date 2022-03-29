@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Domain;
+namespace darwin.Domain;
 
 public class PaginationFilter
 {

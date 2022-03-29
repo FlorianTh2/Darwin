@@ -1,8 +1,8 @@
-using hello_asp_identity.Domain;
-using hello_asp_identity.Domain.Results;
-using hello_asp_identity.Entities;
+using darwin.Domain;
+using darwin.Domain.Results;
+using darwin.Entities;
 
-namespace hello_asp_identity.Services;
+namespace darwin.Services;
 
 public interface IUserService
 {

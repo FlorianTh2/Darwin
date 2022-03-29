@@ -1,8 +1,8 @@
-using hello_asp_identity.Contracts.V1.Responses;
+using darwin.Contracts.V1.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace hello_asp_identity.Filters;
+namespace darwin.Filters;
 
 public class ValidationFilter : IAsyncActionFilter
 {

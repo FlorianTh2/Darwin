@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 public static class CorsInstaller
 {
     public static void InstallCors(this IServiceCollection services)

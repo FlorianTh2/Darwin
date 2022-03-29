@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
 using System.Web;
-using hello_asp_identity.Contracts.V1.Requests;
-using hello_asp_identity.Services;
+using darwin.Contracts.V1.Requests;
+using darwin.Services;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace hello_asp_identity.Services;
+namespace darwin.Services;
 
 public class UriService : IUriService
 {

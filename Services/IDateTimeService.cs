@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Services;
+namespace darwin.Services;
 
 public interface IDateTimeService
 {

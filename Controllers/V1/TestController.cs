@@ -1,16 +1,16 @@
 using AutoMapper;
-using hello_asp_identity.Contracts.V1;
-using hello_asp_identity.Contracts.V1.Requests;
-using hello_asp_identity.Contracts.V1.Responses;
-using hello_asp_identity.Data;
-using hello_asp_identity.Entities;
-using hello_asp_identity.Services;
+using darwin.Contracts.V1;
+using darwin.Contracts.V1.Requests;
+using darwin.Contracts.V1.Responses;
+using darwin.Data;
+using darwin.Entities;
+using darwin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
-namespace hello_asp_identity.Controllers.V1;
+namespace darwin.Controllers.V1;
 
 [ApiController]
 [Produces("application/json")]

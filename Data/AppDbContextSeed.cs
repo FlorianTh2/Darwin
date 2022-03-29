@@ -1,12 +1,12 @@
-using hello_asp_identity.Domain;
-using hello_asp_identity.Domain.Enums;
-using hello_asp_identity.Entities;
-using hello_asp_identity.Extensions;
-using hello_asp_identity.Options;
+using darwin.Domain;
+using darwin.Domain.Enums;
+using darwin.Entities;
+using darwin.Extensions;
+using darwin.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace hello_asp_identity.Data;
+namespace darwin.Data;
 
 public static class AppDbContextSeed
 {

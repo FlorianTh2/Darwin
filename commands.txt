@@ -1,3 +1,10 @@
+https://stackoverflow.com/questions/6576442/should-user-and-address-be-in-separate-tables
+https://stackoverflow.com/a/49949217/11244995
+https://stackoverflow.com/a/6576474/11244995
+
+https://softwareengineering.stackexchange.com/questions/241089/keep-user-and-user-profile-in-different-tables
+https://stackoverflow.com/questions/3889797/mysql-user-profile-details-table-setup-best-practice
+
 cd Hello.WebApi
 dotnet ef migrations add "AdjustedContext" --context AppDbContext -o .\Data\Migrations # --project "Hello.WebApi"
 

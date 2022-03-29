@@ -1,8 +1,8 @@
 using System.Text;
-using hello_asp_identity.Options;
+using darwin.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace hello_asp_identity.Helpers;
+namespace darwin.Helpers;
 
 public class JwtHelper
 {

@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Options;
+namespace darwin.Options;
 
 public class SeedOptions
 {

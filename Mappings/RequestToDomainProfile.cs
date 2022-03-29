@@ -1,8 +1,8 @@
-namespace hello_asp_identity.Mappings;
+namespace darwin.Mappings;
 
 using AutoMapper;
-using hello_asp_identity.Contracts.V1.Requests;
-using hello_asp_identity.Domain;
+using darwin.Contracts.V1.Requests;
+using darwin.Domain;
 
 public class RequestToDomainProfile : Profile
 {

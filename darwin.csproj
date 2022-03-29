@@ -5,7 +5,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>hello_asp_identity</RootNamespace>
+    <RootNamespace>darwin</RootNamespace>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

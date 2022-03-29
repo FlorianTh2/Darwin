@@ -1,5 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 
-namespace hello_asp_identity.Extensions;
+namespace darwin.Extensions;
 
 public static class HttpContextExtensions { }

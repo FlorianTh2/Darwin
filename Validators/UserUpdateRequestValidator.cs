@@ -1,12 +1,12 @@
 using System.Data;
+using darwin.Contracts.V1.Requests;
+using darwin.Extensions;
+using darwin.Options;
+using darwin.Services;
 using FluentValidation;
-using hello_asp_identity.Contracts.V1.Requests;
-using hello_asp_identity.Extensions;
-using hello_asp_identity.Options;
-using hello_asp_identity.Services;
 using Microsoft.Extensions.Options;
 
-namespace hello_asp_identity.Validators;
+namespace darwin.Validators;
 
 public class UserUpdateRequestValidator : AbstractValidator<UserUpdateRequest>
 {

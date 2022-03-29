@@ -1,9 +1,9 @@
-using hello_asp_identity.Helpers;
-using hello_asp_identity.Options;
+using darwin.Helpers;
+using darwin.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 
 public static class OptionInstaller
 {

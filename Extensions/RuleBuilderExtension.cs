@@ -1,8 +1,8 @@
 using System.Globalization;
+using darwin.Services;
 using FluentValidation;
-using hello_asp_identity.Services;
 
-namespace hello_asp_identity.Extensions;
+namespace darwin.Extensions;
 
 public static class RuleBuilderExtensions
 {

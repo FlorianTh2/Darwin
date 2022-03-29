@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace hello_asp_identity.Extensions;
+namespace darwin.Extensions;
 
 public static class SwaggerExtensions
 {

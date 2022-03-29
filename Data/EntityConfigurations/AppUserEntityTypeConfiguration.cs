@@ -1,8 +1,8 @@
-using hello_asp_identity.Entities;
+using darwin.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace hello_asp_identity.Data.EntityConfigurations;
+namespace darwin.Data.EntityConfigurations;
 
 public class AppUserEntityTypeConfiguration : IEntityTypeConfiguration<AppUser>
 {

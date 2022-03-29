@@ -2,23 +2,23 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
-using hello_asp_identity.Contracts.V1;
-using hello_asp_identity.Data;
-using hello_asp_identity.Domain;
-using hello_asp_identity.Domain.Enums;
-using hello_asp_identity.Domain.Errors;
-using hello_asp_identity.Domain.Results;
-using hello_asp_identity.Entities;
-using hello_asp_identity.Extensions;
-using hello_asp_identity.Options;
-using hello_asp_identity.Provider;
+using darwin.Contracts.V1;
+using darwin.Data;
+using darwin.Domain;
+using darwin.Domain.Enums;
+using darwin.Domain.Errors;
+using darwin.Domain.Results;
+using darwin.Entities;
+using darwin.Extensions;
+using darwin.Options;
+using darwin.Provider;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
-namespace hello_asp_identity.Services;
+namespace darwin.Services;
 
 public class IdentityService : IIdentityService
 {

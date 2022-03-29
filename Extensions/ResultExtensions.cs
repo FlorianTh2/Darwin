@@ -1,10 +1,10 @@
 using AutoMapper;
-using hello_asp_identity.Contracts.V1.Responses;
-using hello_asp_identity.Domain.Errors;
-using hello_asp_identity.Domain.Results;
+using darwin.Contracts.V1.Responses;
+using darwin.Domain.Errors;
+using darwin.Domain.Results;
 using Microsoft.AspNetCore.Mvc;
 
-namespace hello_asp_identity.Extensions;
+namespace darwin.Extensions;
 
 public static class ResultExtensions
 {

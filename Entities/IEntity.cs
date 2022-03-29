@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Entities;
+namespace darwin.Entities;
 
 public interface IEntity<T>
 {

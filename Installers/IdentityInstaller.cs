@@ -1,10 +1,10 @@
-using hello_asp_identity.Data;
-using hello_asp_identity.Entities;
-using hello_asp_identity.Options;
-using hello_asp_identity.Provider;
+using darwin.Data;
+using darwin.Entities;
+using darwin.Options;
+using darwin.Provider;
 using Microsoft.AspNetCore.Identity;
 
-namespace hello_asp_identity.Installers;
+namespace darwin.Installers;
 
 public static class IdentityInstaller
 {

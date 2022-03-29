@@ -1,9 +1,9 @@
-using hello_asp_identity.Contracts.V1.Requests;
-using hello_asp_identity.Contracts.V1.Responses;
-using hello_asp_identity.Domain;
-using hello_asp_identity.Services;
+using darwin.Contracts.V1.Requests;
+using darwin.Contracts.V1.Responses;
+using darwin.Domain;
+using darwin.Services;
 
-namespace hello_asp_identity.Helpers;
+namespace darwin.Helpers;
 
 public class PaginationHelper
 {

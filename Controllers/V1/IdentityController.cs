@@ -1,18 +1,18 @@
 using AutoMapper;
-using hello_asp_identity.Attributes;
-using hello_asp_identity.Contracts.V1;
-using hello_asp_identity.Contracts.V1.Requests;
-using hello_asp_identity.Contracts.V1.Responses;
-using hello_asp_identity.Domain.Enums;
-using hello_asp_identity.Domain.Results;
-using hello_asp_identity.Extensions;
-using hello_asp_identity.Helpers;
-using hello_asp_identity.Services;
+using darwin.Attributes;
+using darwin.Contracts.V1;
+using darwin.Contracts.V1.Requests;
+using darwin.Contracts.V1.Responses;
+using darwin.Domain.Enums;
+using darwin.Domain.Results;
+using darwin.Extensions;
+using darwin.Helpers;
+using darwin.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
-namespace hello_asp_identity.Controllers.V1;
+namespace darwin.Controllers.V1;
 
 public class IdentityController : AppControllerBase
 {

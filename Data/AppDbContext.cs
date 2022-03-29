@@ -1,12 +1,12 @@
 using System.Reflection;
-using hello_asp_identity.Data.EntityConfigurations;
-using hello_asp_identity.Entities;
-using hello_asp_identity.Services;
+using darwin.Data.EntityConfigurations;
+using darwin.Entities;
+using darwin.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace hello_asp_identity.Data;
+namespace darwin.Data;
 
 public class AppDbContext : IdentityDbContext<
     AppUser,

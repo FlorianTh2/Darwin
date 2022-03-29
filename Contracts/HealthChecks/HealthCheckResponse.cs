@@ -1,4 +1,4 @@
-namespace hello_asp_identity.Contracts.HealthChecks;
+namespace darwin.Contracts.HealthChecks;
 
 public record HealthCheckResponse
 {

@@ -1,7 +1,7 @@
-using hello_asp_identity.Contracts.HealthChecks;
+using darwin.Contracts.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
-namespace hello_asp_identity.Extensions;
+namespace darwin.Extensions;
 
 public static class HealthCheckOptionsExtensions
 {

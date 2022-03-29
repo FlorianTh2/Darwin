@@ -1,7 +1,7 @@
-using hello_asp_identity.Domain.Results;
+using darwin.Domain.Results;
 using Microsoft.AspNetCore.Identity;
 
-namespace hello_asp_identity.Extensions;
+namespace darwin.Extensions;
 
 public static class IdentityResultExtensions
 {

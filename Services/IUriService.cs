@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
-using hello_asp_identity.Contracts.V1.Requests;
+using darwin.Contracts.V1.Requests;
 
-namespace hello_asp_identity.Services;
+namespace darwin.Services;
 
 public interface IUriService
 {
